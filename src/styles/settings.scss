@@ -1,0 +1,6 @@
+// Vuetify 3 SCSS 主題變數入口
+// 在這裡覆寫 Vuetify 內建變數即可自訂整體主題，詳見：
+// https://vuetifyjs.com/en/features/sass-variables/
+@forward 'vuetify/settings' with (
+  $button-height: 40px
+);

@@ -1,0 +1,23 @@
+{
+  "extends": ["stylelint-config-standard-scss"],
+  "overrides": [
+    {
+      "files": ["**/*.vue"],
+      "customSyntax": "postcss-html",
+      "extends": ["stylelint-config-recommended-vue/scss"],
+      "rules": {
+        "no-empty-source": null
+      }
+    }
+  ],
+  "rules": {
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        "ignorePseudoClasses": ["deep", "global"]
+      }
+    ],
+    "scss/at-rule-no-unknown": null
+  },
+  "ignoreFiles": ["dist/**", "coverage/**", "node_modules/**"]
+}
