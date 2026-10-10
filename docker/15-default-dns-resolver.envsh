@@ -1,0 +1,14 @@
+#!/bin/sh
+# nginx 官方映像檔的 entrypoint 會在 envsubst 之前 source /docker-entrypoint.d/*.envsh。
+# 沒設定 DNS_RESOLVER 時，改用容器 /etc/resolv.conf 的 nameserver（K8s 內即 kube-dns），
+# 避免 nginx.conf 留下字面上的 ${DNS_RESOLVER} 而啟動失敗。明確設定時則不覆蓋。
+if [ -z "${DNS_RESOLVER:-}" ]; then
+    # IPv6 位址在 nginx resolver 指令中需加方括號
+    DNS_RESOLVER=$(awk '$1 == "nameserver" { printf "%s%s", sep, ($2 ~ ":" ? "[" $2 "]" : $2); sep = " " }' /etc/resolv.conf)
+    export DNS_RESOLVER
+fi
+
+if [ -z "${DNS_RESOLVER}" ]; then
+    echo "error: DNS_RESOLVER is not set and no nameserver found in /etc/resolv.conf" >&2
+    exit 1
+fi
