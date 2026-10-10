@@ -7,6 +7,8 @@ import vuetify from 'vite-plugin-vuetify'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // 環境變數檔集中放 env/（.env、.env.example、env.d.ts）
+  envDir: 'env',
   plugins: [
     vue(),
     vueDevTools(),

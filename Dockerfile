@@ -21,10 +21,10 @@ FROM nginx:stable-alpine AS production
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # 放進 templates，容器啟動時由 nginx 映像檔的 entrypoint 以 envsubst 代入 BACKEND_URL、DNS_RESOLVER
-COPY nginx.conf /etc/nginx/templates/default.conf.template
+COPY nginx/nginx.conf /etc/nginx/templates/default.conf.template
 
 # 啟動時若未設定 DNS_RESOLVER，從 /etc/resolv.conf 取預設值（entrypoint 只執行有執行權限的 .envsh）
-COPY docker/15-default-dns-resolver.envsh /docker-entrypoint.d/15-default-dns-resolver.envsh
+COPY nginx/15-default-dns-resolver.envsh /docker-entrypoint.d/15-default-dns-resolver.envsh
 RUN chmod +x /docker-entrypoint.d/15-default-dns-resolver.envsh
 
 EXPOSE 80

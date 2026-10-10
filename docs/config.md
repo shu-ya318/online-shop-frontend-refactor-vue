@@ -104,7 +104,7 @@
 
 - `.gitignore` 排除 node_modules、dist、`.env.local`、測試報告等產出物。
 - `.npmrc` 固定 registry 與 engine 檢查(如 `engine-strict=true`),與第 0 步版號一致。
-- 環境變數:提供 `.env.example`,只有 `VITE_` 開頭的值會暴露給前端,機密資訊不放前端。
+- 環境變數:提供 `env/.env.example`(環境變數集中在 `env/`,Vite 以 `envDir` 讀取),只有 `VITE_` 開頭的值會暴露給前端,機密資訊不放前端。
 - 驗收:`git status` 沒有多餘的產出物;缺少環境變數時有明確提示。
 
 </details>
