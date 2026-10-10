@@ -3,8 +3,11 @@ import { post } from '../http'
 import type { ApiResponse } from '../common/interface'
 import type { StationFareSyncStatus } from './interface'
 
+const LONG_RUNNING_TIMEOUT_MS = 15 * 60 * 1000
+const SYNC_REQUEST_CONFIG = { timeout: LONG_RUNNING_TIMEOUT_MS }
+
 export const syncAllLine = async (): Promise<ApiResponse> => {
-  return await post<ApiResponse>('/metro/sync/sync-all-line')
+  return await post<ApiResponse>('/metro/sync/sync-all-line', undefined, SYNC_REQUEST_CONFIG)
 }
 
 export const syncAllLineTransfer = async (): Promise<ApiResponse> => {

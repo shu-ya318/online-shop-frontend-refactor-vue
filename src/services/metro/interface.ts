@@ -122,16 +122,17 @@ export interface Station {
   id: number
   nameZhTw: string
   nameEn: string
-  atm: string
-  nursingRoom: string
-  diaperTable: string
-  chargingStation: string
-  ticketMachine: string
-  drinkingWater: string
-  restroom: string
-  elevator: string
-  escalator: string
-  updatedAt: string
+  atm: string | null
+  nursingRoom: string | null
+  diaperTable: string | null
+  chargingStation: string | null
+  ticketMachine: string | null
+  locker: string | null
+  drinkingWater: string | null
+  restroom: string | null
+  elevator: string | null
+  escalator: string | null
+  updatedAt: string //  ISO 8601 無時區資訊，值為 UTC
 }
 
 // All Station Paginated

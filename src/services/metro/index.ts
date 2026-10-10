@@ -4,7 +4,6 @@ import type {
   GetMetroMapResponse,
   GetAllStationResponse,
   GetAllStationOptionResponse,
-  GetAllStationFareResponse,
   GetAllLineResponse,
   GetAllLineTransferResponse,
   GetAllLineStationResponse,
@@ -37,10 +36,6 @@ export const getAllStation = async (): Promise<GetAllStationResponse> => {
 
 export const getAllStationOption = async (): Promise<GetAllStationOptionResponse> => {
   return await post<GetAllStationOptionResponse>('/metro/get-all-station-option')
-}
-
-export const getAllStationFare = async (): Promise<GetAllStationFareResponse> => {
-  return await post<GetAllStationFareResponse>('/metro/get-all-station-fare')
 }
 
 export const getAllLine = async (): Promise<GetAllLineResponse> => {
