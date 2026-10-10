@@ -120,7 +120,7 @@ lookGo-frontend-vue3/
 
 - `plugins/`、`locales/`、`styles/`:本專案用了 vue-i18n 與 Vuetify,需要這些資料夾。
 - `composables/`:Vue 3 慣例的 composable 目錄。
-- `__tests__/`:單元測試集中放在 `src/__tests__/`(`tsconfig.app.json` 排除、`tsconfig.vitest.json` 納入)。
+- `__tests__/`:單元測試集中放在 `src/__tests__/`(`tsconfig.app.json` 排除、`tsconfig.vitest.json` 納入)。`tsconfig.vitest.json` 的 `types` 含 `jsdom`,對應的型別由 devDependency `@types/jsdom` 提供,版本與 `jsdom` 主版號保持一致。
 
 ### 擴充時的建議
 

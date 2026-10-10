@@ -3,8 +3,8 @@
 FROM node:24-alpine AS builder
 
 WORKDIR /app
-# 用 build-arg 選擇 npm registry 設定（預設公開 registry；內網用 --build-arg NPM_RC_FILE=.npmrc-nexus）
-ARG NPM_RC_FILE=.npmrc-public
+# 用 build-arg 選擇 npm registry 設定（預設用專案的 .npmrc（公開 registry）；內網用 --build-arg NPM_RC_FILE=.npmrc-nexus）
+ARG NPM_RC_FILE=.npmrc
 COPY ${NPM_RC_FILE} ./.npmrc
 
 # lockfile 進版控，npm ci 會完全照 package-lock.json 安裝，建置結果可重現

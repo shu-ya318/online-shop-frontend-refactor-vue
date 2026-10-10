@@ -164,25 +164,26 @@ Vue 3 + TypeScript 的新專案建議用 date-fns,也是 issue 的決議。注�
 
 ### TypeScript 與型別
 
-| 套件               | 用途                           |
-| ------------------ | ------------------------------ |
-| `typescript`       | TypeScript 編譯器              |
-| `vue-tsc`          | 讓 TypeScript 能檢查 `.vue` 檔 |
-| `@tsconfig/node24` | Node 24 的 tsconfig 基底設定   |
-| `@vue/tsconfig`    | Vue 專案的 tsconfig 基底設定   |
-| `@types/node`      | Node.js 的型別定義             |
-| `@types/lodash-es` | `lodash-es` 的型別定義         |
+| 套件               | 用途                                                                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `typescript`       | TypeScript 編譯器                                                                                                                    |
+| `vue-tsc`          | 讓 TypeScript 能檢查 `.vue` 檔                                                                                                       |
+| `@tsconfig/node24` | Node 24 的 tsconfig 基底設定                                                                                                         |
+| `@vue/tsconfig`    | Vue 專案的 tsconfig 基底設定                                                                                                         |
+| `@types/node`      | Node.js 的型別定義                                                                                                                   |
+| `@types/lodash-es` | `lodash-es` 的型別定義                                                                                                               |
+| `@types/jsdom`     | `jsdom` 的型別定義(`tsconfig.vitest.json` 的 `types` 含 `jsdom`,缺少時 `vue-tsc` 會報 TS2688,`npm run build` 與 Docker 建置都會失敗) |
 
 ### 測試
 
-| 套件                    | 用途                                                                                 |
-| ----------------------- | ------------------------------------------------------------------------------------ |
-| `vitest`                | 單元測試框架,與 Vite 共用設定                                                        |
-| `@vue/test-utils`       | Vue 元件測試工具(掛載、觸發事件、斷言)                                               |
-| `@testing-library/vue`  | 以使用者角度寫元件測試(取代 @testing-library/react)                                  |
-| `jsdom`                 | 在 Node 模擬瀏覽器 DOM,供 Vitest 跑元件測試(需在 Vitest 設定 `environment: 'jsdom'`) |
-| `@playwright/test`      | E2E(端對端)測試,模擬真實瀏覽器操作                                                   |
-| `@vitest/eslint-plugin` | 針對 Vitest 測試檔的 ESLint 規則                                                     |
+| 套件                    | 用途                                                                                                            |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `vitest`                | 單元測試框架,與 Vite 共用設定                                                                                   |
+| `@vue/test-utils`       | Vue 元件測試工具(掛載、觸發事件、斷言)                                                                          |
+| `@testing-library/vue`  | 以使用者角度寫元件測試(取代 @testing-library/react)                                                             |
+| `jsdom`                 | 在 Node 模擬瀏覽器 DOM,供 Vitest 跑元件測試(需在 Vitest 設定 `environment: 'jsdom'`,型別由 `@types/jsdom` 提供) |
+| `@playwright/test`      | E2E(端對端)測試,模擬真實瀏覽器操作                                                                              |
+| `@vitest/eslint-plugin` | 針對 Vitest 測試檔的 ESLint 規則                                                                                |
 
 ### Lint 與格式化
 
