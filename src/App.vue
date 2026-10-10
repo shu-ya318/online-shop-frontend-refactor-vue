@@ -1,13 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// 第 0、1 階段只建立專案與 API 層；版型、路由頁面從第 2 階段開始搬（React 版 App.tsx 的 Provider 組合）
+</script>
 
 <template>
-  <v-app>
-    <v-main>
-      <h1>{{ $t('app.title') }}</h1>
-      <p>
-        Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-        documentation
-      </p>
-    </v-main>
-  </v-app>
+  <main>
+    <h1>lookGo</h1>
+    <p>Vue 3 遷移參考實作：目前完成專案設定。</p>
+  </main>
 </template>
