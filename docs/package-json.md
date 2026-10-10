@@ -50,6 +50,12 @@
 | `npm run test:unit:watch` | `vitest`          | 監聽模式,改檔後自動重跑相關測試,適合開發時使用                           |
 | `npm run test:e2e`        | `playwright test` | 執行 Playwright E2E 測試。首次需執行 `npx playwright install` 下載瀏覽器 |
 
+`vitest` 與 `vitest run` 的差異:
+
+- `vitest`:依環境自動決定模式。本機互動式終端機(TTY)預設進入 watch 模式、不會自動結束;在 CI 或非 TTY(環境變數 `CI` 有值)則自動退化成單次執行。
+- `vitest run`:一律只跑一次就結束,不看環境,結果可預期。
+- 本專案刻意拆成兩支:`test:unit` 用 `vitest run`(給 CI、`lint-staged`、提交前驗證,保證不會卡住不結束),`test:unit:watch` 用 `vitest`(開發時監聽)。這與 Vitest 官方建議一致:官方範本把 `test` 設為 `vitest`,但文件也建議 CI 使用 `vitest run`。若把 `test:unit` 改成 `vitest`,在本機被其他腳本或 hook 呼叫時會停在 watch 模式,所以不建議改。
+
 ### 程式碼品質(Lint / Format)
 
 | 指令                     | 實際執行                                    | 效果                                                                                                                                                                                                     |

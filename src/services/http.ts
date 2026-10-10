@@ -1,7 +1,7 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios'
+import axios, { type AxiosAdapter, type AxiosInstance, type AxiosRequestConfig } from 'axios'
 
 import { toApiError } from './errors'
-import { createTokenManager, type TokenManager } from './tokenManager'
+import { createTokenManager, type TokenManager, type TokenStorage } from './tokenManager'
 
 import type { AuthResponse } from './auth/interface'
 
@@ -35,28 +35,40 @@ const AUTH_ENDPOINTS = [
 /**
  * 這些端點的 401 是「業務錯誤」，不代表 token 失效，不可以刷新、也不可以重送：
  * - /auth/*：帳號密碼錯誤、帳號停用、reset token 無效、refresh 失敗本身
+ * - /user/update-password：舊密碼錯誤
  * 其餘端點的 401 一律視為 access token 失效。
  */
-const NO_REFRESH_ON_401: readonly RegExp[] = [/^\/auth\//]
+const NO_REFRESH_ON_401: readonly RegExp[] = [/^\/auth\//, /^\/user\/update-password$/]
 
 const pathOf = (url?: string): string => (url ?? '').split('?')[0] ?? ''
 const isAuthEndpoint = (url?: string) => AUTH_ENDPOINTS.includes(pathOf(url))
 const canRefreshOn401 = (url?: string): boolean =>
   !NO_REFRESH_ON_401.some((pattern) => pattern.test(pathOf(url)))
 
-const createHttpClient = (): HttpClient => {
+export interface HttpClientOptions {
+  /** 測試用：換掉實際發送請求的 adapter */
+  adapter?: AxiosAdapter
+  storage?: TokenStorage
+  onAuthExpired?: () => void
+}
+
+export const createHttpClient = (options: HttpClientOptions = {}): HttpClient => {
   const instance = axios.create({
     baseURL: BASE_URL,
     timeout: 10000,
+    adapter: options.adapter,
   })
 
   // 刷新請求不經過 instance 的 interceptor，避免刷新時又觸發刷新而無限遞迴
   const refreshClient = axios.create({
     baseURL: BASE_URL,
     timeout: 10000,
+    adapter: options.adapter,
   })
 
   const tokenManager = createTokenManager({
+    storage: options.storage,
+    onAuthExpired: options.onAuthExpired,
     refresh: async () => {
       const { data } = await refreshClient.post<AuthResponse>(REFRESH_URL)
       return data.accessToken

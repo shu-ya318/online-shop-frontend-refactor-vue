@@ -13,6 +13,6 @@ describe('App', () => {
         plugins: [createVuetify(), i18n],
       },
     })
-    expect(wrapper.text()).toContain('Look Go')
+    expect(wrapper.text()).toContain('lookGo')
   })
 })
