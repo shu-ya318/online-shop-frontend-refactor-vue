@@ -1,0 +1,4 @@
+registry=https://<內網 Nexus 主機>/repository/npm-group/
+
+# 內網使用自簽憑證時，理論上建議指定 CA 憑證檔，而不是關閉 SSL 檢查（strict-ssl=false）
+cafile=/path/to/internal-ca.pem

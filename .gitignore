@@ -42,3 +42,12 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# 環境變數：.env.example 進版控，其餘（含 .env.local）不進
+.env
+.env.*
+!.env.example
+
+# 內網 registry 設定含內部主機名，只提交範本 .npmrc-nexus.example
+.npmrc-nexus
+
