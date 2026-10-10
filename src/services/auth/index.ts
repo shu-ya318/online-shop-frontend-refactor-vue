@@ -18,9 +18,8 @@ export const login = async (request: LoginRequest): Promise<AuthResponse> => {
   return await post<AuthResponse>('/auth/log-in', request)
 }
 
-export const refreshTokens = async (): Promise<AuthResponse> => {
-  return await post<AuthResponse>('/auth/refresh-tokens')
-}
+// 刷新 token 一律經由 tokenManager（single-flight），這裡不再對外暴露直接呼叫 /auth/refresh-tokens 的函式。
+// 需要手動刷新時用 tokenManager.refresh()（從 '@/services/http' 匯入）。
 
 export const logout = async () => {
   await post('/auth/log-out')
