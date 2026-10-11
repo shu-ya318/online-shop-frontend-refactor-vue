@@ -130,33 +130,3 @@
 ## 型別檢查、排版、編輯類工具設定檔：eslint.config.ts、.oxlintrc.json、.prettierrc.json、.editorconfig
 
 見[linter-formatter-editor.md](linter-formatter-editor.md)。
-
-## vitest.config.ts
-
-見[vitest.md](../test/vitest.md)。
-
-## playwright.config.ts
-
-見[playwright.md](../test/playwright.md)。
-
-## 專案結構調整
-
-### 調整專案結構
-
-#### 設定語法對應效果
-
-| 做法                                                                         | 效果                                                                       |
-| ---------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| 放在所有設定檔之後                                                           | 設定檔都已用寬範圍 glob 與單一 `@` alias,搬資料夾幾乎不必再動設定,風險最低 |
-| 放在測試、Git hooks 與應用程式層之前                                         | 測試路徑與應用程式碼都依賴結構,避免寫完再搬等於重做                        |
-| 先定好目錄(例如 views/、components/、composables/、api/、schemas/)再一次搬完 | 結構一次到位                                                               |
-| 邊搬邊跑型別檢查                                                             | 及早發現路徑錯誤                                                           |
-
-#### 應避免的錯誤
-
-- 放到最末端才調整,測試與應用程式碼都得重做。
-- 一次動太多,出錯時難以定位。
-
-## Git hooks(husky、lint-staged)
-
-見[git-hooks.md](../repo/git-hooks.md)。
