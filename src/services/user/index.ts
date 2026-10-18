@@ -3,7 +3,7 @@ import { post } from '../http'
 import type { PaginatedResponse, UpdatePasswordResponse } from '../common/interface'
 import type {
   GetAllUserRequest,
-  GetCurrentUserResponse,
+  CurrentUser,
   UpdateAvatarRequest,
   UpdateAvatarResponse,
   UpdateBirthDateRequest,
@@ -17,18 +17,14 @@ import type {
   UpdateUsernameResponse,
 } from './interface'
 
-export const getCurrentUser = async (): Promise<GetCurrentUserResponse> => {
-  return await post<GetCurrentUserResponse>('/user/get-current-user')
+export const getCurrentUser = async (): Promise<CurrentUser> => {
+  return await post<CurrentUser>('/user/get-current-user')
 }
 
 export const getAllUser = async (
   request: GetAllUserRequest = {},
-): Promise<PaginatedResponse<GetCurrentUserResponse>> => {
-  return await post<PaginatedResponse<GetCurrentUserResponse>>(
-    '/user/get-all-user',
-    {},
-    { params: request },
-  )
+): Promise<PaginatedResponse<CurrentUser>> => {
+  return await post<PaginatedResponse<CurrentUser>>('/user/get-all-user', {}, { params: request })
 }
 
 export const updateUsername = async (

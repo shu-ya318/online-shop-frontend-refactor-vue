@@ -16,6 +16,10 @@ export interface ApiErrorInit {
   cause?: unknown
 }
 
+/**
+ * 所有 API 失敗統一轉成的錯誤型別。
+ * `message` 已是可直接顯示的繁中訊息；只負責描述錯誤，不做導頁等副作用。
+ */
 export class ApiError extends Error {
   readonly kind: ApiErrorKind
   readonly status: number
@@ -31,8 +35,10 @@ export class ApiError extends Error {
   }
 }
 
+/** 判斷是否為 ApiError（type guard） */
 export const isApiError = (error: unknown): error is ApiError => error instanceof ApiError
 
+/** 取得可顯示的錯誤訊息：ApiError 回傳其 message，其他錯誤回傳 fallback */
 export const getErrorMessage = (
   error: unknown,
   fallback = '發生未預期的錯誤，請稍後再試',
@@ -78,6 +84,10 @@ const tryParseJson = (text: string): unknown => {
   }
 }
 
+/**
+ * 解析後端錯誤 body，取出可顯示的訊息。
+ * 支援 `{ message }` 與 `{ 欄位: 訊息 }` map 兩種格式；其他格式（HTML、空值等）回傳空物件。
+ */
 export const parseErrorBody = (body: unknown): ParsedErrorBody => {
   // 字串先試著當 JSON；不是 JSON（HTML 錯誤頁、CORS 被拒的純文字）就放棄解析
   const data = typeof body === 'string' ? tryParseJson(body) : body

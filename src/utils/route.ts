@@ -1,18 +1,32 @@
-// 確保色碼字串帶有 # 前綴
+/**
+ * 色碼沒有 # 開頭時補上 #
+ * @param raw 色碼字串，例如 `E3002C` 或 `#E3002C`
+ * @returns 一定帶 # 的色碼
+ */
 export const normalizeHexColor = (raw: string): string => (raw.startsWith('#') ? raw : `#${raw}`)
 
-// 無條件進入法，和北捷官方計算方式一致
+/**
+ * 把秒數轉成「N 分鐘」，不足一分鐘也算一分鐘（無條件進位，與北捷官方算法一致）
+ * @param seconds 車程秒數
+ * @returns 例如 `5 分鐘`
+ */
 export const formatTravelTime = (seconds: number): string => `${Math.ceil(seconds / 60)} 分鐘`
 
-// 最大餘數法：各區段各自無條件進位會和車程時間 label（總秒數無條件進位）加總不一致，
-// 改用此法依各區段實際秒數比例分配分鐘數，確保加總結果等於車程時間 label 的值
+/**
+ * 把每段的秒數換成分鐘，並讓各段分鐘加總等於總車程分鐘
+ *
+ * 每段各自進位，加總會比總車程多，所以改用最大餘數法：
+ * 先全部無條件捨去，缺的分鐘數再補給小數部分最大的幾段。
+ * @param secondsList 各區段秒數
+ * @param totalSeconds 總秒數，總分鐘為其無條件進位
+ * @returns 各區段分鐘數，順序與 `secondsList` 相同
+ */
 export const allocateMinutes = (secondsList: number[], totalSeconds: number): number[] => {
   const targetMinutes = Math.ceil(totalSeconds / 60)
   const rawMinutes = secondsList.map((seconds) => seconds / 60)
   const flooredMinutes = rawMinutes.map((minutes) => Math.floor(minutes))
   const remainder = targetMinutes - flooredMinutes.reduce((sum, minutes) => sum + minutes, 0)
 
-  // 小數部分由大到小，前 remainder 個區段各多分配 1 分鐘
   const bumpedIndexes = new Set(
     rawMinutes
       .map((minutes, index) => ({ index, fraction: minutes - Math.floor(minutes) }))
@@ -23,8 +37,15 @@ export const allocateMinutes = (secondsList: number[], totalSeconds: number): nu
   return flooredMinutes.map((minutes, index) => (bumpedIndexes.has(index) ? minutes + 1 : minutes))
 }
 
-// 依序交錯排列「區段秒數、轉乘秒數、區段秒數、…」，轉乘總秒數平均分配到各轉乘點，
-// 再以最大餘數法轉為分鐘數（偶數索引為區段、奇數索引為轉乘）
+/**
+ * 產生路線每一塊的分鐘數，依序為「區段、轉乘、區段、轉乘…」
+ *
+ * 轉乘總秒數平均分給每個轉乘點，所以偶數索引是區段，奇數索引是轉乘。
+ * @param segmentsSeconds 各區段秒數
+ * @param transferTimeSeconds 轉乘總秒數
+ * @param totalSeconds 總車程秒數
+ * @returns 每一塊的分鐘數，加總等於總車程分鐘
+ */
 export const buildRouteChunkMinutes = (
   segmentsSeconds: number[],
   transferTimeSeconds: number,

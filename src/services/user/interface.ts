@@ -1,6 +1,6 @@
 import type { MembershipTier, UserRole, UserStatus } from './types'
 
-export interface GetCurrentUserResponse {
+export interface CurrentUser {
   id: number
   email: string
   username: string

@@ -14,6 +14,7 @@ declare module 'axios' {
   }
 }
 
+/** createHttpClient 的回傳值：axios 實例、token 管理器與 `post` 包裝 */
 export interface HttpClient {
   instance: AxiosInstance
   tokenManager: TokenManager
@@ -45,13 +46,21 @@ const isAuthEndpoint = (url?: string) => AUTH_ENDPOINTS.includes(pathOf(url))
 const canRefreshOn401 = (url?: string): boolean =>
   !NO_REFRESH_ON_401.some((pattern) => pattern.test(pathOf(url)))
 
+/** createHttpClient 的選項，主要供測試注入 */
 export interface HttpClientOptions {
   /** 測試用：換掉實際發送請求的 adapter */
   adapter?: AxiosAdapter
+  /** 存放 access token 的儲存體；未提供時用預設的 localStorage（失敗退回記憶體） */
   storage?: TokenStorage
+  /** 登入失效（refresh 失敗）時的回呼 */
   onAuthExpired?: () => void
 }
 
+/**
+ * 建立 HTTP client：
+ * - request：自動帶 Bearer token，快過期先刷新（single-flight）
+ * - response：非業務 401 會刷新後重送一次；所有失敗統一轉成 ApiError
+ */
 export const createHttpClient = (options: HttpClientOptions = {}): HttpClient => {
   const instance = axios.create({
     baseURL: BASE_URL,
@@ -132,6 +141,7 @@ export const createHttpClient = (options: HttpClientOptions = {}): HttpClient =>
   return { instance, tokenManager, post }
 }
 
+/** 全站共用的 client；元件與 store 一律透過 `post` 呼叫，禁止直接用 axios */
 export const httpClient = createHttpClient()
 export const { post, tokenManager } = httpClient
 
