@@ -25,15 +25,15 @@
 
 依 `src/` 現況整理,只列檔案是否存在,不代表內容完整。
 
-| 範圍       | 已有檔案                                                                  | 空檔(0 行)                | 尚未建立                    |
-| ---------- | ------------------------------------------------------------------------- | ------------------------- | --------------------------- |
-| utils      | `date`、`validation`、`route`、`station`                                  |                           |                             |
-| services   | `errors`、`http`、`tokenManager`                                          |                           | `socket`、各領域 `index.ts` |
-| stores     | `auth`(8)、`user`(10)、`station`(7)、`metroMap`(9)、`stationBookmark`(14) |                           |                             |
-| router     | `guards`                                                                  | `authExpired`、`redirect` |                             |
-| components | (無)                                                                      | `UserProfileMenu`         | 其餘元件                    |
-| 其他       | `App`、`vuetify`                                                          |                           |                             |
-| e2e        | `e2e/app.spec.ts`                                                         |                           | 登入、查地圖、收藏流程      |
+| 範圍       | 已有檔案                                                                  | 空檔(0 行)        | 尚未建立                    |
+| ---------- | ------------------------------------------------------------------------- | ----------------- | --------------------------- |
+| utils      | `date`、`validation`、`route`、`station`                                  |                   |                             |
+| services   | `errors`、`http`、`tokenManager`                                          |                   | `socket`、各領域 `index.ts` |
+| stores     | `auth`(8)、`user`(10)、`station`(7)、`metroMap`(9)、`stationBookmark`(14) |                   |                             |
+| router     | `guards`(22)、`redirect`(22)                                              | `authExpired`     |                             |
+| components | (無)                                                                      | `UserProfileMenu` | 其餘元件                    |
+| 其他       | `App`、`vuetify`                                                          |                   |                             |
+| e2e        | `e2e/app.spec.ts`                                                         |                   | 登入、查地圖、收藏流程      |
 
 ## services 核心測試的情境
 
@@ -85,7 +85,7 @@
 
 ## stores / router / components / plugins 的規劃情境
 
-下列為規劃情境(規劃共 62 個案例;已實作的 `auth` 8、`user` 10、`station` 7、`metroMap` 9、`stationBookmark` 14,實際數與規劃不同,以表中標註與檔案內 `it` 為準),依撰寫順序排列。`router/`、`components/` 內對應 spec 目前多為空檔(0 行)。
+下列為規劃情境(規劃共 62 個案例;已實作的 `guards` 22、`auth` 8、`user` 10、`station` 7、`metroMap` 9、`stationBookmark` 14,實際數與規劃不同,以表中標註與檔案內 `it` 為準),依撰寫順序排列。`router/` 的 `authExpired.spec.ts`、`components/` 內對應 spec 目前仍為空檔(0 行)。
 
 ### 4. stores(依 `auth` → `user` → `station` → 其餘)
 
@@ -99,11 +99,11 @@
 
 ### 5. router(`guards` 依賴 store,`redirect`、`authExpired` 較單純)
 
-| 測試檔                                 | 案例數 | 情境                                                                                                                                                                            |
-| -------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `router/__tests__/guards.spec.ts`      | 15     | 未登入導到登入頁並帶 redirect;公開頁;404;一般使用者進管理頁;管理員;`ensureUser` 網路錯誤的三種情況;401;已登入開登入頁的 redirect;外部 redirect 改去首頁;公開頁背景載入;分頁標題 |
-| `router/__tests__/redirect.spec.ts`    | 5      | 站內路徑、外部網址、反斜線/tab/換行、`/auth` 底下、空值與多個值                                                                                                                 |
-| `router/__tests__/authExpired.spec.ts` | 2      | 需要登入的頁面:重設、導到登入頁帶 redirect、通知;公開頁:只重設、留在原頁                                                                                                        |
+| 測試檔                                 | 案例數     | 情境                                                                                                                                                                                                                                                                                                                           |
+| -------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `router/__tests__/guards.spec.ts`      | 22(已完成) | 未登入(需登入頁、管理頁、公開頁、404);一般使用者與管理員進管理頁;`ensureUser` 失敗(管理頁網路錯誤從別頁點過來/直接開網址、一般頁網路錯誤放行、401、等待期間 token 被清掉);已登入開登入頁(站內 redirect、無 redirect、三種外部 redirect、確認失敗留原頁);公開頁背景載入(不擋導覽、失敗放行);分頁標題(有/無 title、導覽取消不改) |
+| `router/__tests__/redirect.spec.ts`    | 22(已完成) | 站內路徑、外部網址、反斜線/tab/換行等控制字元、`/auth` 底下(`/authors` 不受影響)、空值與多個值(陣列取第一個)                                                                                                                                                                                                                   |
+| `router/__tests__/authExpired.spec.ts` | 2          | 需要登入的頁面:重設、導到登入頁帶 redirect、通知;公開頁:只重設、留在原頁                                                                                                                                                                                                                                                       |
 
 ### 6. components 與 plugins
 
@@ -136,14 +136,14 @@ services 階段(3 個 session):
 
 stores / router / components / plugins 階段(再 6 個 session,共 9 個):
 
-| session | 內容                                          | 案例數 | 原因                                                                |
-| ------- | --------------------------------------------- | ------ | ------------------------------------------------------------------- |
-| 4       | `auth.spec.ts`、`user.spec.ts`(已完成)        | 18     | 地基:login/logout、`$reset` 與晚到回應;兩者共用 token 與 pinia 設定 |
-| 5       | `station.spec.ts`、`metroMap.spec.ts`(已完成) | 16     | 同類的「只採用最後一次」「共用請求」寫法                            |
-| 6       | `stationBookmark.spec.ts`(已完成)             | 14     | 依賴登入狀態與 `$reset` 競態,獨立上下文                             |
-| 7       | `guards.spec.ts`                              | 15     | 案例最多、依賴 auth/user store 與網路錯誤分支                       |
-| 8       | `redirect.spec.ts`、`authExpired.spec.ts`     | 7      | 規模小,合併一個 session                                             |
-| 9       | `UserProfileMenu.spec.ts`、`vuetify.spec.ts`  | 6      | UI 與設定對照,需要 jsdom 與 Vuetify 的 setup                        |
+| session | 內容                                              | 案例數 | 原因                                                                |
+| ------- | ------------------------------------------------- | ------ | ------------------------------------------------------------------- |
+| 4       | `auth.spec.ts`、`user.spec.ts`(已完成)            | 18     | 地基:login/logout、`$reset` 與晚到回應;兩者共用 token 與 pinia 設定 |
+| 5       | `station.spec.ts`、`metroMap.spec.ts`(已完成)     | 16     | 同類的「只採用最後一次」「共用請求」寫法                            |
+| 6       | `stationBookmark.spec.ts`(已完成)                 | 14     | 依賴登入狀態與 `$reset` 競態,獨立上下文                             |
+| 7       | `guards.spec.ts`(已完成)                          | 22     | 案例最多、依賴 auth/user store 與網路錯誤分支                       |
+| 8       | `redirect.spec.ts`(已完成)、`authExpired.spec.ts` | 24     | 規模小,合併一個 session                                             |
+| 9       | `UserProfileMenu.spec.ts`、`vuetify.spec.ts`      | 6      | UI 與設定對照,需要 jsdom 與 Vuetify 的 setup                        |
 
 每個 session 結束前跑該 spec,再跑「必跑的測試」一次。
 
@@ -164,6 +164,7 @@ stores / router / components / plugins 階段(再 6 個 session,共 9 個):
 - 常用的假資料(假 JWT、deferred promise、假 adapter)應集中放 `src/test/`。目前 `makeToken` 定義在 `tokenManager.spec.ts`、`http.spec.ts` 內(兩者簽章不同),`createDeferred` 已抽到 `src/test/testUtils.ts`(`tokenManager.spec.ts` 仍有自己一份,待改用共用版),`createHttpError` 在 `tokenManager.spec.ts`、`http.spec.ts`、`errors.spec.ts`(其中為 `httpError`)內,待抽出。
 - `vi.fn()` 必須帶型別參數,例如 `vi.fn<() => void>()`,否則 oxlint 的 `vitest/require-mock-type-parameters` 會報錯。
 - store 測試對 service 用不帶工廠的 `vi.mock('@/services/xxx')`(自動 mock),再以 `vi.mocked(fn)` 取得型別;用工廠寫 `vi.fn()` 會被上一條規則擋下。`tokenManager` 則用真的(`@/services/http`),每個測試前後 `clearAuth()`。
+- router 測試用真實 `routes` 但把 `component` 換成空殼(`guards.spec.ts` 的 `stubRoutes`),並 `vi.mock` 掉 `AuthLayout.vue`、`MainLayout.vue`,只驗守衛不載入頁面。
 - 情境標註:每組案例上方加 `// Scenario: 名稱 —— 說明`,與 `utils/__tests__/date.spec.ts` 一致。
 - 新增 service / util / store 時,同一個 PR 補上對應 spec。
 
