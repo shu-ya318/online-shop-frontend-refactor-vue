@@ -1,6 +1,6 @@
 {
   "extends": "./tsconfig.app.json",
-  "include": ["src/**/__tests__/*", "env/env.d.ts"],
+  "include": ["src/**/__tests__/*", "src/test/**/*", "env/env.d.ts"],
   "exclude": [],
   "compilerOptions": {
     "lib": ["ES2022"],

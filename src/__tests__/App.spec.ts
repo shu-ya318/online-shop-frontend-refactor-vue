@@ -3,8 +3,8 @@ import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createVuetify } from 'vuetify'
 
-import App from '../App.vue'
-import i18n from '../plugins/i18n'
+import App from '@/App.vue'
+import i18n from '@/plugins/i18n'
 
 describe('App', () => {
   it('mounts renders properly', () => {

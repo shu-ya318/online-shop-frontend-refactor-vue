@@ -5,6 +5,7 @@ import { resetUserScopedStores } from '@/stores/plugins/userScoped'
 import { tokenManager } from '@/services/http'
 import { login as loginApi, logout as logoutApi, signup as signupApi } from '@/services/auth'
 import { toApiError, type ApiError } from '@/services/errors'
+
 import type { LoginRequest, SignupRequest } from '@/services/auth/interface'
 
 /** 登出結果：本機一律登出，serverLoggedOut 表示後端是否成功 */

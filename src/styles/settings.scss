@@ -1,6 +1,67 @@
-// Vuetify 3 SCSS 主題變數入口
-// 在這裡覆寫 Vuetify 內建變數即可自訂整體主題，詳見：
-// https://vuetifyjs.com/en/features/sass-variables/
-@forward 'vuetify/settings' with (
-  $button-height: 40px
+// $grid-breakpoints：theme.ts:5-13 的自訂斷點。必須和 src/plugins/vuetify.ts 的 BREAKPOINTS 一致
+// （那邊給 useDisplay() 用，這邊給 d-md-none、v-col-md-6 等 CSS class 用），
+// src/plugins/__tests__/vuetify.spec.ts 會檢查兩邊有沒有對齊。
+// MUI 只有到 xl；Vuetify 多一個 xxl，給一個比 xl 大的值即可。
+// $typography：theme.ts:218-267。Vuetify 4 改用 Material Design 3 的字級名稱，
+// 這裡只覆寫 React 版實際用到的變體（h1～h3、overline 沒有任何地方用，不覆寫）：
+//   MUI h4        → text-headline-large   2.25rem / 700
+//   MUI h5        → text-headline-small   1.5rem  / 700
+//   MUI h6        → text-title-large      1rem    / 700
+//   MUI subtitle1 → text-title-medium     1.125rem / 500
+//   MUI subtitle2 → text-title-small      1rem    / 500
+//   MUI body1     → text-body-large       1.125rem / 400
+//   MUI body2     → text-body-medium      1rem    / 400
+//   MUI button    → text-label-large      1rem    / 500（也是 v-btn 的字級）
+//   MUI caption   → text-body-small       0.875rem / 400
+// 只寫 size 與 weight，行高、字距沿用 Vuetify 的預設值（Vuetify 會把這裡的設定和預設值合併）。
+// $button-font-weight：theme.ts:15-21 MuiButton root 的 fontWeight 700。
+// 同一段的 textTransform: 'none' 不用設：Vuetify 4 的按鈕預設就不轉大寫。
+@use 'vuetify/settings' with (
+  $grid-breakpoints: (
+    'xs': 0,
+    'sm': 768px,
+    'md': 1024px,
+    'lg': 1280px,
+    'xl': 1536px,
+    'xxl': 2560px,
+  ),
+  $typography: (
+    'headline-large': (
+      'size': 2.25rem,
+      'weight': 700,
+    ),
+    'headline-small': (
+      'size': 1.5rem,
+      'weight': 700,
+    ),
+    'title-large': (
+      'size': 1rem,
+      'weight': 700,
+    ),
+    'title-medium': (
+      'size': 1.125rem,
+      'weight': 500,
+    ),
+    'title-small': (
+      'size': 1rem,
+      'weight': 500,
+    ),
+    'body-large': (
+      'size': 1.125rem,
+      'weight': 400,
+    ),
+    'body-medium': (
+      'size': 1rem,
+      'weight': 400,
+    ),
+    'label-large': (
+      'size': 1rem,
+      'weight': 500,
+    ),
+    'body-small': (
+      'size': 0.875rem,
+      'weight': 400,
+    ),
+  ),
+  $button-font-weight: 700
 );

@@ -5,7 +5,7 @@ import { aliases, mdi } from 'vuetify/iconsets/mdi-svg'
 import { zhHant } from 'vuetify/locale'
 
 /**
-  * MUI 每個顏色有 dark / main / light 三個值，Vuetify 的顏色是扁平的名稱，這裡統一對應成：
+ * MUI 每個顏色有 dark / main / light 三個值，Vuetify 的顏色是扁平的名稱，這裡統一對應成：
  *   main → xxx，dark → xxx-darken-1，light → xxx-lighten-1
  * 例如 MUI 的 'primary.dark' 在 Vuetify 寫 color="primary-darken-1"，
  * CSS 裡寫 rgb(var(--v-theme-primary-darken-1))。

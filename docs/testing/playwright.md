@@ -1,6 +1,6 @@
 # playwright.config.ts
 
-一個區域:e2e 測試。
+e2e 測試。
 
 ## e2e 測試
 

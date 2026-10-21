@@ -11,6 +11,9 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
+    // 自動載入：template 裡用到哪個 v-xxx 元件才 import 哪個（不用在 main.ts 註冊全部元件）。
+    // configFile：用 Sass 覆寫 Vuetify 的斷點與字級（見 src/styles/settings.scss），
+    // 只設 createVuetify 的 display.thresholds 不會改到 d-md-none 這類 CSS class 的斷點。
     vuetify({
       autoImport: true,
       styles: {

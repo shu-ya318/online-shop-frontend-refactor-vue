@@ -1,0 +1,33 @@
+:root {
+  /*
+（略過第 9 行的註解）
+   * 沒有安裝的電腦會落到瀏覽器預設字型。這裡維持同樣的首選字型，並補上各平台內建的繁中字型當備援。
+   * 是否改成自行載入 Noto Sans TC 列在待決事項。
+   * Vuetify 4 的字型由 --v-font-body / --v-font-heading 決定（不需要 Sass）。
+   */
+  --v-font-body: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', 'Heiti TC', sans-serif;
+
+  /* 品牌漸層：React 版在 AuthLayout、HomePage 等處各自寫死 #5fa6f0 → #6de69d（4 次以上） */
+  --lookgo-brand-gradient: linear-gradient(to right, #5fa6f0, #6de69d);
+}
+
+@layer vuetify-core.reset {
+  ul,
+  ol,
+  figure,
+  details,
+  summary {
+    padding: 0;
+    margin: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    margin: 0;
+  }
+}

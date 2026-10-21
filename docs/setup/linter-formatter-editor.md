@@ -18,16 +18,16 @@
 
 #### 設定語法對應效果
 
-| 設定                                                                     | 效果                                                |
-| ------------------------------------------------------------------------ | --------------------------------------------------- |
-| `defineConfigWithVueTs(...)`                                             | 讓 Vue 檔的 `<script lang="ts">` 也能用 TS 規則檢查 |
-| `files: ['**/*.{vue,ts,mts,tsx}']`                                       | 只檢查 Vue 與 TS 檔                                 |
-| `globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**'])`      | 不檢查建置產物與覆蓋率報告                          |
-| `...pluginVue.configs['flat/essential']`                                 | 套用 Vue 最基本的規則(會導致錯誤的寫法)             |
-| `vueTsConfigs.recommended`                                               | 套用 typescript-eslint 的建議規則                   |
-| `{ ...pluginVitest.configs.recommended, files: ['src/**/__tests__/*'] }` | Vitest 規則只套用在測試檔                           |
-| `...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json')`            | 讀取 oxlint 設定,關閉 ESLint 中與 oxlint 重複的規則 |
-| `skipFormatting`(`eslint-config-prettier/flat`)                          | 關閉所有與 Prettier 衝突的排版規則                  |
+| 設定                                                                                      | 效果                                                |
+| ----------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `defineConfigWithVueTs(...)`                                                              | 讓 Vue 檔的 `<script lang="ts">` 也能用 TS 規則檢查 |
+| `files: ['**/*.{vue,ts,mts,tsx}']`                                                        | 只檢查 Vue 與 TS 檔                                 |
+| `globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**'])`                       | 不檢查建置產物與覆蓋率報告                          |
+| `...pluginVue.configs['flat/essential']`                                                  | 套用 Vue 最基本的規則(會導致錯誤的寫法)             |
+| `vueTsConfigs.recommended`                                                                | 套用 typescript-eslint 的建議規則                   |
+| `{ ...pluginVitest.configs.recommended, files: ['src/**/__tests__/*', 'src/test/**/*'] }` | Vitest 規則只套用在測試檔                           |
+| `...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json')`                             | 讀取 oxlint 設定,關閉 ESLint 中與 oxlint 重複的規則 |
+| `skipFormatting`(`eslint-config-prettier/flat`)                                           | 關閉所有與 Prettier 衝突的排版規則                  |
 
 #### 應避免的錯誤
 

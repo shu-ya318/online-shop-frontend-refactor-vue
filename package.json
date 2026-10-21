@@ -33,6 +33,7 @@
   "dependencies": {
     "@date-fns/tz": "1.5.0",
     "@mdi/font": "7.4.47",
+    "@mdi/js": "7.4.47",
     "@stomp/stompjs": "7.3.0",
     "@tiptap/core": "3.31.4",
     "@tiptap/pm": "3.31.4",
