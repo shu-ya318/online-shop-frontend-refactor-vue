@@ -30,7 +30,7 @@ const emit = defineEmits<{
           @click="emit('toggle-sidebar')"
         />
         <RouterLink :to="{ name: 'home' }" class="app-header__logo">
-          <!-- 連結裡只有圖片時，alt 就是連結的名稱（React 版是 alt='logo'） -->
+          <!-- 連結裡只有圖片時，alt 就是連結的名稱 -->
           <img :src="logoUrl" alt="LookGo 首頁" width="84" height="17" />
         </RouterLink>
         <!-- 導覽按鈕：md 以上才顯示（d-* class 的斷點來自 styles/settings.scss） -->
