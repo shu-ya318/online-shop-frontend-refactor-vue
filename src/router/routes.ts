@@ -1,7 +1,7 @@
-import type { RouteRecordRaw } from 'vue-router'
-
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
+
+import type { RouteRecordRaw } from 'vue-router'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -17,10 +17,10 @@ declare module 'vue-router' {
 }
 
 /**
- * 全站路由表。
- * - /auth/*：AuthLayout，`guestOnly`，已登入者會被導走
+ * 全網站路由表。
+ * - /auth/*：AuthLayout，`guestOnly`，已登入者會被重導向
  * - /：MainLayout，內含公開頁、需登入頁與 /admin（需管理員）
- * - /unauthorized、其餘未匹配網址：不套版型的錯誤頁
+ * - /unauthorized、其餘未匹配網址：錯誤頁
  * 權限由 `meta` 宣告，實際檢查在 `router/guards.ts` 的 `authGuard`。
  */
 export const routes: RouteRecordRaw[] = [
@@ -29,7 +29,6 @@ export const routes: RouteRecordRaw[] = [
     component: AuthLayout,
     meta: { guestOnly: true },
     children: [
-      // React 版直接進 /auth 是空白的右半邊（沒有 index 路由）
       { path: '', redirect: { name: 'login' } },
       {
         path: 'login',
@@ -61,7 +60,6 @@ export const routes: RouteRecordRaw[] = [
     path: '/',
     component: MainLayout,
     children: [
-      // React 版：{ index: true, element: <Navigate to='/home' replace /> }
       { path: '', redirect: { name: 'home' } },
       {
         path: 'home',
@@ -101,11 +99,9 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: '車站聊天室', requiresAuth: true },
       },
       {
-        // 沒有 component：子頁面直接顯示在 MainLayout 的 <RouterView>（React 版用 AdminGuard 的 <Outlet>）
         path: 'admin',
         meta: { requiresAuth: true, requiresAdmin: true },
         children: [
-          // React 版直接進 /admin 是空白頁（AdminGuard 只有 Outlet，沒有 index 路由）
           { path: '', redirect: { name: 'admin-user-management' } },
           {
             path: 'user-management',

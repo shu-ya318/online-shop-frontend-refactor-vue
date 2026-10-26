@@ -16,7 +16,7 @@ export const useUserStore = defineStore(
 
     /** 進行中的 get-current-user（同時呼叫的人共用） */
     let pending: Promise<CurrentUser | null> | null = null
-    /** 每發一次請求 +1，$reset() 也 +1。回應回來時編號不是最新的，就不寫入 */
+    /** 每發一次請求 +1，$reset() 也 +1。回應時編號必須是最新的才寫入 */
     let latestRequestId = 0
 
     /** 發出請求，並用編號擋掉過期的回應 */

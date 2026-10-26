@@ -90,7 +90,7 @@ lookGo 前端:捷運地圖查詢、站點收藏、站內聊天室、行程規劃
 
 ### 新增頁面
 
-1. 在 `src/views/<領域>/` 建立 `XxxPage.vue`(參考 `views/auth/LoginPage.vue`)
+1. 在 `src/views/<領域>/` 建立 `XxxView.vue`(參考 `views/auth/LoginView.vue`)
 2. 在 `src/router/routes.ts` 加路由,需登入/管理員就設 `meta`
 3. 需要導覽入口必須改 `layouts/navItems.ts`
 4. 文案放 `src/locales/` 兩份語系檔，包含繁體中文、英文。

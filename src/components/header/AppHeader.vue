@@ -2,8 +2,10 @@
 import { RouterLink } from 'vue-router'
 
 import UserProfileMenu from '@/components/header/UserProfileMenu.vue'
+
 import logoUrl from '@/assets/logo_transparent.png'
 import { HEADER_HEIGHT } from '@/constants/layout'
+
 import type { NavItem } from '@/layouts/navItems'
 
 defineProps<{
@@ -17,8 +19,12 @@ const emit = defineEmits<{
 </script>
 
 <template>
+  <!-- App bar (container) -->
+  <!-- v-bind 綁定HEADER_HEIGHT，屬性值才被解析為 JS 運算式 (而非字串),取出變數的值-->
   <v-app-bar :height="HEADER_HEIGHT" color="surface" flat border="b" class="app-header">
+    <!-- Inner content -->
     <div class="app-header__inner">
+      <!-- Start section -->
       <div class="app-header__start">
         <!-- 漢堡選單：md（1024px）以下才顯示 -->
         <v-app-bar-nav-icon
@@ -29,26 +35,28 @@ const emit = defineEmits<{
           :aria-expanded="sidebarOpen"
           @click="emit('toggle-sidebar')"
         />
+        <!-- logo -->
         <RouterLink :to="{ name: 'home' }" class="app-header__logo">
           <!-- 連結裡只有圖片時，alt 就是連結的名稱 -->
           <img :src="logoUrl" alt="LookGo 首頁" width="84" height="17" />
         </RouterLink>
-        <!-- 導覽按鈕：md 以上才顯示（d-* class 的斷點來自 styles/settings.scss） -->
+        <!-- Nav section ：md 以上才顯示 -->
         <nav class="app-header__nav d-none d-md-flex align-center ml-6" aria-label="主選單">
           <v-btn
             v-for="item in navItems"
             :key="item.label"
             :to="item.to"
             :prepend-icon="item.icon"
-            variant="text"
-            color="primary"
             :ripple="false"
             class="app-header__nav-btn"
+            variant="text"
+            color="primary"
           >
             {{ item.label }}
           </v-btn>
         </nav>
       </div>
+      <!-- End section：User profile menu -->
       <UserProfileMenu />
     </div>
   </v-app-bar>

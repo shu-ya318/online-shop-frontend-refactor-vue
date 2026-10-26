@@ -8,18 +8,19 @@ import AppSidebar from '@/components/AppSidebar.vue'
 import AppHeader from '@/components/header/AppHeader.vue'
 
 import { useUserStore } from '@/stores/user'
+
 import { ADMIN_NAV_ITEMS, BASE_NAV_ITEMS } from './navItems'
 
+// NavItems
 const { isAdmin } = storeToRefs(useUserStore())
-
 const navItems = computed(() =>
   isAdmin.value ? [...BASE_NAV_ITEMS, ...ADMIN_NAV_ITEMS] : BASE_NAV_ITEMS,
 )
 
+// Sidebar
 const isSidebarOpen = ref(false)
 
 const { mdAndUp } = useDisplay()
-
 watch(mdAndUp, (isDesktop) => {
   if (isDesktop) {
     isSidebarOpen.value = false
@@ -28,17 +29,22 @@ watch(mdAndUp, (isDesktop) => {
 </script>
 
 <template>
+  <!-- AppHeader -->
   <AppHeader
     :nav-items="navItems"
     :sidebar-open="isSidebarOpen"
     @toggle-sidebar="isSidebarOpen = !isSidebarOpen"
   />
+  <!-- AppSidebar -->
   <AppSidebar v-model="isSidebarOpen" :items="navItems" />
-  <!-- v-main 會依 v-app-bar 的高度自動留出上方空間，不必像 React 版寫 marginTop -->
+  <!-- Main section -->
+  <!-- v-main 依 v-app-bar 高度自動留出上方空間，不必像 React 版寫 marginTop -->
   <v-main class="main-layout-main">
+    <!-- Page -->
     <div class="main-layout-content">
       <RouterView />
     </div>
+    <!--AppFooter -->
     <AppFooter />
   </v-main>
 </template>
