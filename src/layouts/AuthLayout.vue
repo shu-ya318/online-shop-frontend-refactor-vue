@@ -6,6 +6,7 @@ import logoUrl from '@/assets/logo_transparent.png'
 // 「sm 以上」用 useDisplay() 判斷，不在 CSS 寫死 768px：斷點只維護在 plugins/vuetify.ts 與 styles/settings.scss。
 const { smAndUp } = useDisplay()
 </script>
+
 <template>
   <div class="auth-layout bg-quaternary pa-sm-8 pa-md-12">
     <div

@@ -18,7 +18,7 @@ export interface NavItem {
 /** MUI 圖示 → MDI：MapOutlined → mdiMapOutline、BookmarkBorder → mdiBookmarkOutline、
  *  RouteOutlined → mdiRoutes、ChatBubbleOutlineOutlined → mdiChatOutline */
 export const BASE_NAV_ITEMS: readonly NavItem[] = [
-  { label: '路網圖查詢', to: { name: 'network-map' }, icon: mdiMapOutline },
+  { label: '路網圖查詢', to: { name: 'metro-map' }, icon: mdiMapOutline },
   { label: '車站書籤', to: { name: 'station-bookmark' }, icon: mdiBookmarkOutline },
   { label: '旅程規劃', to: { name: 'trip-planner' }, icon: mdiRoutes },
   { label: '車站聊天室', to: { name: 'station-chat-room' }, icon: mdiChatOutline },

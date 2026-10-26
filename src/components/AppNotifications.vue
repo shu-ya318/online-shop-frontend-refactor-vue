@@ -5,6 +5,7 @@ import { useNotifyQueue } from '@/composables/notify'
 // Vuetify 4 的 v-snackbar-queue 重寫過，可以同時顯示多則（v3 一次只顯示一則）。
 const messages = useNotifyQueue()
 </script>
+
 <template>
   <v-snackbar-queue v-model="messages" location="bottom right" :total-visible="3" closable />
 </template>

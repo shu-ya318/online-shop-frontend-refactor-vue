@@ -34,7 +34,7 @@ watch(mdAndUp, (isDesktop) => {
     @toggle-sidebar="isSidebarOpen = !isSidebarOpen"
   />
   <AppSidebar v-model="isSidebarOpen" :items="navItems" />
-  <!-- v-main 會依 v-app-bar 的高度自動留出上方空間，不必像 React 版寫 marginTop: '4.375rem' -->
+  <!-- v-main 會依 v-app-bar 的高度自動留出上方空間，不必像 React 版寫 marginTop -->
   <v-main class="main-layout-main">
     <div class="main-layout-content">
       <RouterView />
