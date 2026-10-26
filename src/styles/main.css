@@ -1,14 +1,31 @@
 :root {
   /*
-（略過第 9 行的註解）
    * 沒有安裝的電腦會落到瀏覽器預設字型。這裡維持同樣的首選字型，並補上各平台內建的繁中字型當備援。
-   * 是否改成自行載入 Noto Sans TC 列在待決事項。
    * Vuetify 4 的字型由 --v-font-body / --v-font-heading 決定（不需要 Sass）。
    */
   --v-font-body: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', 'Heiti TC', sans-serif;
 
   /* 品牌漸層：React 版在 AuthLayout、HomePage 等處各自寫死） */
   --lookgo-brand-gradient: linear-gradient(to right, #5fa6f0, #6de69d);
+}
+
+/*
+ * - 輸入的文字 1rem / 500（Vuetify 預設 16px / 400；字級相同，只改字重）
+ * - 瀏覽器自動填入帳密時不要變成淺藍底
+ * 高度、框線顏色見 plugins/vuetify.ts 的 defaults。
+ */
+.v-field--variant-outlined .v-field__input {
+  font-weight: 500;
+}
+
+.v-field--variant-outlined .v-field__input:-webkit-autofill {
+  box-shadow: 0 0 0 100px #fff inset;
+  -webkit-text-fill-color: #000;
+}
+
+/* Chromium 的原生日期欄位（註冊頁的出生日期）內部上下各多 1px，欄位會變成 50px；拿掉，和其他欄位一樣 48px */
+.v-field--variant-outlined input[type='date']::-webkit-datetime-edit-fields-wrapper {
+  padding-block: 0;
 }
 
 @layer vuetify-core.reset {

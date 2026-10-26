@@ -59,7 +59,7 @@ const createHttpError = (status: number) =>
 const setup = (initialToken: string | null) => {
   const storage = createMemoryStorage(initialToken)
   const refresh = vi.fn<() => Promise<string>>()
-  const onAuthExpired = vi.fn()
+  const onAuthExpired = vi.fn<() => void>()
   const manager = createTokenManager({ refresh, storage, onAuthExpired, now: () => NOW_MS })
 
   return { manager, storage, refresh, onAuthExpired }
@@ -298,7 +298,7 @@ describe('tokenManager：session 失效', () => {
   // Scenario: setOnAuthExpired —— 可換掉處理函式，null 則停用
   it('setOnAuthExpired 可以換掉處理函式，傳 null 則停用', () => {
     const { manager, onAuthExpired } = setup(validToken)
-    const another = vi.fn()
+    const another = vi.fn<() => void>()
 
     manager.setOnAuthExpired(another)
     manager.expireSession()
@@ -343,7 +343,7 @@ describe('tokenManager：setAccessToken', () => {
   // Scenario: setAccessToken(token) —— 寫入 storage 並通知訂閱者
   it('傳入 token 會寫入並通知訂閱者', () => {
     const { manager, storage } = setup(null)
-    const listener = vi.fn()
+    const listener = vi.fn<() => void>()
     manager.subscribe(listener)
 
     manager.setAccessToken(validToken)
@@ -369,7 +369,7 @@ describe('tokenManager：subscribe', () => {
   it('token 變化會通知訂閱者，取消訂閱後不再通知', async () => {
     const { manager, refresh } = setup(expiredToken)
     refresh.mockResolvedValue(freshToken)
-    const listener = vi.fn()
+    const listener = vi.fn<() => void>()
     const unsubscribe = manager.subscribe(listener)
 
     await manager.refresh()

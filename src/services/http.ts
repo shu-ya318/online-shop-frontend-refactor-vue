@@ -43,8 +43,11 @@ const NO_REFRESH_ON_401: readonly RegExp[] = [/^\/auth\//, /^\/user\/update-pass
 
 const pathOf = (url?: string): string => (url ?? '').split('?')[0] ?? ''
 const isAuthEndpoint = (url?: string) => AUTH_ENDPOINTS.includes(pathOf(url))
-const canRefreshOn401 = (url?: string): boolean =>
-  !NO_REFRESH_ON_401.some((pattern) => pattern.test(pathOf(url)))
+
+const canRefreshOn401 = (url: string | undefined): boolean => {
+  const path = pathOf(url)
+  return !NO_REFRESH_ON_401.some((pattern) => pattern.test(path))
+}
 
 /** createHttpClient 的選項，主要供測試注入 */
 export interface HttpClientOptions {

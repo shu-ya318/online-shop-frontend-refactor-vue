@@ -94,6 +94,17 @@ export const vuetifyOptions = {
     fallback: 'zhHant',
     messages: { zhHant },
   },
+  // - variant：MUI 的 TextField 預設就是 outlined；Vuetify 預設是 filled
+  // - density：comfortable 的輸入框高 48px，就是 React 版的 height: '3rem'
+  // - color：focus 時的框線顏色，React 版是 #303030（neutral），Vuetify 預設是 primary
+  // 頁面上明寫的 props 優先（例如 SearchInput 的 variant="solo-filled"、density="compact"）
+  defaults: {
+    VTextField: {
+      variant: 'outlined' as const,
+      density: 'comfortable' as const,
+      color: 'neutral',
+    },
+  },
 }
 
 export default createVuetify(vuetifyOptions)

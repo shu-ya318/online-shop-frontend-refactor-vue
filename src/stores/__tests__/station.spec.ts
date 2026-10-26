@@ -27,7 +27,7 @@ const makeStationDetail = (overrides: Partial<StationDetail> = {}): StationDetai
   ...overrides,
 })
 
-const serverError = (message: string) => new ApiError({ kind: 'server', status: 500, message })
+const serverError = (message: string) => new ApiError({ kind: 'http', status: 500, message })
 
 describe('useStationStore', () => {
   let pinia: Pinia

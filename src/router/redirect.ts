@@ -11,8 +11,7 @@ const hasControlCharacter = (value: string): boolean =>
 /**
  * 從 ?redirect= 取出可以安全導過去的站內路徑；不安全或沒有就回傳 null（呼叫端改用預設頁）。
  *
-（略過第 15 行的註解）
- * 但 redirect 是網址參數，任何人都能造一個連結，所以只接受站內路徑，避免「開放式重新導向」
+ * redirect 是網址參數，任何人都能造一個連結，所以只接受站內路徑，避免「開放式重新導向」
  * （例如 /auth/login?redirect=https://釣魚網站，登入後被帶走）。
  *
  * 規則：

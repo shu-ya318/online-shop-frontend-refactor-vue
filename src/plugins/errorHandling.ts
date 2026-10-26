@@ -10,8 +10,6 @@ const isChunkLoadError = (error: unknown): boolean =>
     error.message,
   )
 /**
-（略過第 14 行的註解）
- *
  * React 版沒有 ErrorBoundary，任何 render 錯誤都會變成 React Router 的預設錯誤頁（整頁英文錯誤訊息）。
  * Vue 元件 render 或生命週期出錯不會讓整個 App 卸載，但預設只印在 console，使用者不知道發生什麼事。
  * - app.config.errorHandler：元件、watcher、生命週期鉤子裡沒有被接住的錯誤

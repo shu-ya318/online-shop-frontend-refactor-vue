@@ -16,6 +16,8 @@
 // 只寫 size 與 weight，行高、字距沿用 Vuetify 的預設值（Vuetify 會把這裡的設定和預設值合併）。
 // $button-font-weight：theme.ts:15-21 MuiButton root 的 fontWeight 700。
 // 同一段的 textTransform: 'none' 不用設：Vuetify 4 的按鈕預設就不轉大寫。
+// Vuetify 預設取 typography 的 body-large，上面已經改成 1.125rem（MUI body1），輸入框會跟著變大，
+// 而且輸入框的最小高度用它計算（1.125rem × 1.5 + 上下 padding = 51px），高度就不是 React 版的 3rem。
 @use 'vuetify/settings' with (
   $grid-breakpoints: (
     'xs': 0,
@@ -63,5 +65,6 @@
       'weight': 400,
     ),
   ),
-  $button-font-weight: 700
+  $button-font-weight: 700,
+  $input-font-size: 1rem
 );

@@ -56,12 +56,14 @@ export const useAuthStore = defineStore('auth', () => {
   /** 登入並開始新工作階段；失敗 reject ApiError */
   const login = async (request: LoginRequest): Promise<void> => {
     const { accessToken: token } = await loginApi(request)
+
     startSession(token)
   }
 
   /** 註冊並開始新工作階段；失敗 reject ApiError */
-  const signup = async (request: SignupRequest) => {
+  const signup = async (request: SignupRequest): Promise<void> => {
     const { accessToken: token } = await signupApi(request)
+
     startSession(token)
   }
 
