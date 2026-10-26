@@ -10,6 +10,8 @@ lookGo 前端:捷運地圖查詢、站點收藏、站內聊天室、行程規劃
 - 路由 Vue Router 4;狀態 Pinia(setup store 寫法)
 - i18n vue-i18n(`src/locales/` en、zh-TW)
 - HTTP:axios;即時聊天:STOMP over WebSocket(`@stomp/stompjs`);驗證:zod
+- 其他依賴:富文字 tiptap、PDF 匯出 jspdf、日期 date-fns(+`@date-fns/tz`)、數值 decimal.js、工具 lodash-es、JWT 解碼 jwt-decode、身分證驗證 taiwan-id-validator
+- 工具鏈:lint 用 oxlint + eslint + stylelint,格式化 prettier,測試 Vitest 4 + Playwright,husky + lint-staged
 - 後端:Spring(本機 `localhost:8082`),API 前綴 `/api/v1`,WebSocket `/ws`
 - 容器化部署:Docker + nginx 反向代理(`nginx/`),前後端同源
 
@@ -24,7 +26,7 @@ lookGo 前端:捷運地圖查詢、站點收藏、站內聊天室、行程規劃
 - docs/architecture/error-handling.md:`ApiError` 與錯誤解析
 - docs/testing/testing.md:測試寫法
 - Vue 程式碼規範(篇幅長,不要預先載入):`docs/guides/vue-conventions.md`。僅在撰寫/審查元件、composable、store、路由時,依章節(命名、SFC、模板、Composition API 等)用 Grep 或指定行數讀取相關段落,勿整份讀入
-- 其他(按需查閱):`docs/architecture/`(socket、utils)、`docs/setup/`、`docs/testing/`、`docs/repo/`、`docs/deploy/`、`docs/todo.md`;索引見 `docs/README.md`
+- 其他(按需查閱):`docs/architecture/`(router-flow、store、socket、utils)、`docs/setup/`、`docs/testing/`(vitest、playwright)、`docs/repo/`、`docs/deploy/`、`docs/guides/react-to-vue-migration-guide.md`(React 轉 Vue 重構指引);索引見 `docs/README.md`(資料夾依重構順序 setup → architecture → testing → repo → deploy)
 
 ## 文件撰寫規範(docs/setup/)
 
@@ -39,7 +41,7 @@ lookGo 前端:捷運地圖查詢、站點收藏、站內聊天室、行程規劃
 
 - 安裝:`npm install`
 - 開發:`npm run dev`(Vite proxy 把 `/api/v1`、`/ws` 轉到 `localhost:8082`)
-- 建構:`npm run build`(先 `type-check` 再 `vite build`)
+- 建構:`npm run build`(`run-p` 平行執行 `type-check` 與 `build-only`(`vite build`);預覽:`npm run preview`)
 - 型別檢查:`npm run type-check`(`vue-tsc --build`)
 - Lint:`npm run lint`(oxlint → eslint → stylelint,皆帶 `--fix`)
 - 格式化:`npm run format`(prettier)

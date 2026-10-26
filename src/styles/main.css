@@ -7,7 +7,7 @@
    */
   --v-font-body: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', 'Heiti TC', sans-serif;
 
-  /* 品牌漸層：React 版在 AuthLayout、HomePage 等處各自寫死 #5fa6f0 → #6de69d（4 次以上） */
+  /* 品牌漸層：React 版在 AuthLayout、HomePage 等處各自寫死） */
   --lookgo-brand-gradient: linear-gradient(to right, #5fa6f0, #6de69d);
 }
 
