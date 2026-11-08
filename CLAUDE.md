@@ -32,7 +32,7 @@ lookGo 前端:捷運地圖查詢、站點收藏、站內聊天室、行程規劃
 
 - 新增或修改 `docs/setup/` 的設定檔說明前,先讀 @docs/writing-guide.md,並以 `docs/setup/index-html.md` 為範本
 - 結構:H1 檔名 + 1~2 句總覽 → H2 依檔案由上到下分區 → 每區固定 H3「設定語法對應效果」(表格)+「應避免的錯誤」
-- 錯誤條目:錯誤N(全文連號)→ 現象 → 後果 → Vue 版做法,缺一不可
+- 錯誤條目:不編號,以現象為父列點,「後果」「Vue 版做法」為縮排子列點,缺一不可
 - 敘述精簡,一句一個重點,內容要能口述給新手工程師聽
 - 只寫讀過原始檔後確認的事實;不確定的標「待確認」並詢問,不要補全
 - `docs/setup/index.md` 為總覽筆記,不套用此規範;其他資料夾暫不受此規範約束
@@ -66,7 +66,7 @@ lookGo 前端:捷運地圖查詢、站點收藏、站內聊天室、行程規劃
 - 所有 HTTP 一律經 `src/services/http.ts` 的 `post<T>()`,禁止在元件或 store 直接用 axios/fetch
 - 各領域 service:`services/<領域>/index.ts`(API 函式)+ `interface.ts`(request/response 型別);WebSocket 在 `services/stationChat/socket.ts`
 - 錯誤:所有失敗統一轉成 `ApiError`(`kind`、`status`、`message`、`fieldErrors`、`cause`),由 `services/errors.ts` 負責,不做導頁等副作用;訊息已是可顯示的繁中。呼叫端用 `isApiError` / `getErrorMessage`
-- Token:access token 只存記憶體,由 `services/tokenManager.ts` 管理(快過期判斷、single-flight 刷新、用獨立 `refreshClient` 避免循環依賴);refresh token 走 cookie;`stores/auth.ts` 把狀態同步成 Pinia
+- Token:access token 存在 localStorage(key 為 `lookgo-auth`,localStorage 不可用時退回記憶體),由 `services/tokenManager.ts` 管理(快過期判斷、single-flight 刷新、用獨立 `refreshClient` 避免循環依賴);refresh token 走 cookie;`stores/auth.ts` 把狀態同步成 Pinia
 - 登入失效流程:tokenManager 觸發 `setOnAuthExpired` → `router/authExpired.ts` 重置 user-scoped stores、提示、必要時導到 `login?redirect=`
 - 與使用者綁定的 store 用 `userScoped` 選項(`stores/plugins/userScoped.ts`),登出/失效時會被 `resetUserScopedStores` 一併重置
 - 路由:`routes.ts` 以 `meta.requiresAuth` / `meta.requiresAdmin` 控管,守衛在 `router/guards.ts`
@@ -104,7 +104,7 @@ lookGo 前端:捷運地圖查詢、站點收藏、站內聊天室、行程規劃
 
 ## 常見地雷
 
-- 環境變數放 `env/`(非根目錄),複製 `env/.env.example` 為 `env/.env.local`;只有 `VITE_` 開頭會暴露給前端,且 build 時就寫死,不放機密
+- 環境變數檔放專案根目錄(Vite 預設,未設 `envDir`),複製 `.env.example` 為 `.env.local`;只有 `VITE_` 開頭會暴露給前端,且 build 時就寫死,不放機密
 - `VITE_API_BASE_URL` 預設 `/api/v1`;跨網域部署時後端 CORS 要含前端網址且必須 HTTPS,refresh cookie 才送得出去
 - 登入密碼錯誤的 401 不可觸發 token 刷新(`NO_REFRESH_ON_401`),改 `http.ts` 時別破壞
 - `package.json` 依賴版本為精確版本(無 `^`),升級需逐一確認
