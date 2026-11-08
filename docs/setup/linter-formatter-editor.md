@@ -51,7 +51,7 @@ oxlint 是用 Rust 寫的高速 linter,負責先跑一輪最基本的檢查,ESLi
 #### 應避免的錯誤
 
 - 若沒有 `env.browser`,瀏覽器全域變數將會被報成未定義。
-- 在這裡新增規則後,沒有重跑 ESLint,`buildFromOxlintConfigFile` 才會同步關掉重複規則;兩邊規則來源要保持一致。
+- 改了這個檔案的檔名或位置,卻沒同步改 `eslint.config.ts` 的 `buildFromOxlintConfigFile('.oxlintrc.json')`,ESLint 就讀不到 oxlint 設定,重複的規則不會被關掉。
 
 ### .stylelintrc.json
 
