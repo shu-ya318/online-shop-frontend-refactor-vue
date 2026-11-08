@@ -1,11 +1,12 @@
 # package.json(含 package-lock.json) 說明
 
-- package.json 會列出專案要裝的套件與指令。
-- 以下依 `package.json` 的區塊順序,說明各項設定的用途與指令效果。
+- 定位
+  - 描述專案的基本資訊、腳本、依賴套件名稱與版本等。
+  - 可以想成是專案的說明書，快速瞭解專案的核心設定。
 
 ## 前端框架語言重構時的考量
 
-可依照以下分類檢視目前的套件：
+可依照以下分類檢視目前的套件如何處理：
 
 - 1. 直接照用
 - 2. 換成 Vue3 生態系的對應套件
@@ -14,51 +15,68 @@
 
 ## 1. 基本資訊
 
-| 欄位      | 值                     | 說明                                                                               |
-| --------- | ---------------------- | ---------------------------------------------------------------------------------- |
-| `name`    | `lookgo-frontend-vue3` | 專案名稱。npm 規範要求全小寫,不可含空白                                            |
-| `version` | `1.0.0`                | 專案版本號,採 SemVer(主版號.次版號.修訂號)                                         |
-| `private` | `true`                 | 禁止被 `npm publish` 發佈到 npm registry                                           |
-| `type`    | `module`               | 將 `.js` 視為 ESM(使用 `import` / `export`)。設定檔(如 `vite.config.ts`)也依此解析 |
+| 欄位           | 值                                                                                                                             | 說明                                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `name`         | `如：lookgo-frontend-vue3`                                                                                                     | 專案名稱。npm 規範要求全小寫,不可含空白                                                                     |
+| `version`      | `如：1.0.0(建議正式發版再進大版號)`                                                                                            | 專案版本號,採 SemVer(主版號.次版號.修訂號)。可讓`vite.config.ts` 讀取並注入 `__APP_VERSION__`(見 `vite.md`) |
+| `private`      | `true`                                                                                                                         | 禁止被 `npm publish` 發佈到 npm registry                                                                    |
+| `type`         | `module`                                                                                                                       | 將 `.js` 視為 ESM(使用 `import` / `export`)。設定檔(如 `vite.config.ts`)也依此解析                          |
+| `browserslist` | `> 1%`(全球使用率超過 1% 的瀏覽器)、`last 2 versions`(每個瀏覽器最新的 2 個版本)、`not dead`(排除官方已停止維護的瀏覽器,如 IE) | 目標瀏覽器清單(要支援哪些瀏覽器)。`autoprefixer` 依此決定要補哪些 CSS 前綴(如 `-webkit-`)                   |
 
 ## 2. scripts(指令腳本)
 
 - 以 `npm run <名稱>` 執行。`test` 與 `start` 可省略 `run`,其餘都要加。
+- 若以 Vite 的 mode(模式,決定讀哪個 `.env.*` 檔)區分環境(如： `dev`、`uat` )，會多一組帶 mode 的指令。
 
 ### 開發與建置
 
-| 指令                 | 實際執行                               | 效果                                                                                                                                                                                                           |
-| -------------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run dev`        | `vite`                                 | 啟動本機開發伺服器,支援 HMR(熱更新),存檔後畫面即時更新                                                                                                                                                         |
-| `npm run build`      | `run-p type-check "build-only {@}" --` | `run-p`(來自 `npm-run-all2`)讓型別檢查與打包**平行**執行,任一失敗即視為 build 失敗。`{@}` 會把額外參數轉給 `build-only`,例如 `npm run build -- --mode staging`。結尾的 `--` 是分隔符號,避免參數被 `run-p` 吃掉 |
-| `npm run build-only` | `vite build`                           | 只打包,不做型別檢查。產出在 `dist/`                                                                                                                                                                            |
-| `npm run type-check` | `vue-tsc --build`                      | 只做 TypeScript 型別檢查(含 `.vue` 檔)。`--build` 啟用專案參考(Project References)模式,依 `tsconfig` 的關聯逐一檢查並做增量快取,不產出檔案                                                                     |
-| `npm run preview`    | `vite preview`                         | 在本機預覽 `dist/` 打包結果,用來模擬正式環境。須先 build                                                                                                                                                       |
+| 指令                     | 實際執行                                           | 效果                                                                                                                                                                                                                                                                 |
+| ------------------------ | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`            | `vite`(或 `vite --mode dev`)                       | 啟動本機開發伺服器,支援 HMR(熱更新),存檔後畫面即時更新。有帶 `--mode dev` 時,另讀取 `.env.dev`                                                                                                                                                                       |
+| `npm run uat`            | `vite --mode uat`                                  | 以 `uat` mode 啟動開發伺服器,讀取 `.env.uat`                                                                                                                                                                                                                         |
+| `npm run build`          | `run-p type-check "build-only {@}" --`(或 `run-s`) | `run-p`(來自 `npm-run-all2`)讓型別檢查與打包**平行**執行,任一失敗即視為 build 失敗;`run-s` 則**依序**執行,型別檢查失敗就不打包。`{@}` 會把額外參數轉給 `build-only`,例如 `npm run build -- --mode staging`。結尾的 `--` 是分隔符號,避免參數被 `run-p` / `run-s` 吃掉 |
+| `npm run build:dev`      | `run-s type-check build-only:dev`                  | 依序型別檢查 + 以 `dev` mode 打包。不接受額外參數                                                                                                                                                                                                                    |
+| `npm run build:uat`      | `run-s type-check build-only:uat`                  | 依序型別檢查 + 以 `uat` mode 打包。不接受額外參數                                                                                                                                                                                                                    |
+| `npm run build-only`     | `vite build`                                       | 只打包,不做型別檢查。產出在 `dist/`                                                                                                                                                                                                                                  |
+| `npm run build-only:dev` | `vite build --mode dev`                            | 只以 `dev` mode 打包,不做型別檢查                                                                                                                                                                                                                                    |
+| `npm run build-only:uat` | `vite build --mode uat`                            | 只以 `uat` mode 打包,不做型別檢查                                                                                                                                                                                                                                    |
+| `npm run type-check`     | `vue-tsc --build`                                  | 只做 TypeScript 型別檢查(含 `.vue` 檔)。`--build` 啟用專案參考(Project References)模式,依 `tsconfig` 的關聯逐一檢查並做增量快取,不產出檔案                                                                                                                           |
+| `npm run preview`        | `vite preview`                                     | 在本機預覽 `dist/` 打包結果,用來模擬正式環境。須先 build                                                                                                                                                                                                             |
+| `npm run preview:dev`    | `vite preview --mode dev`                          | 以 `dev` mode 預覽打包結果                                                                                                                                                                                                                                           |
+| `npm run preview:uat`    | `vite preview --mode uat`                          | 以 `uat` mode 預覽打包結果                                                                                                                                                                                                                                           |
 
-> **備註:`build` 目前寫法 vs. `vue-tsc -b && vite build`**
+> 沒帶 `--mode` 的 `build`、`build-only`、`preview` 會用 Vite 預設的 `production` mode,只讀 `.env` 與 `.env.production`。要指定環境時,改用 `build:dev`、`build:uat` 等帶 mode 的指令。
+
+> **備註:`build` 的三種寫法比較**
 >
-> | 比較項目   | 目前寫法 `run-p type-check "build-only {@}" --`                | 簡化寫法 `vue-tsc -b && vite build`                                      |
-> | ---------- | -------------------------------------------------------------- | ------------------------------------------------------------------------ |
-> | 執行方式   | 型別檢查與打包**平行**同時跑                                   | **依序**執行:先檢查,通過才打包                                           |
-> | 速度       | 較快,總時間約為兩者中較慢的那個                                | 較慢,總時間為兩者相加                                                    |
-> | 型別有錯時 | 打包可能已跑完或跑到一半,最後整體回報失敗                      | 檢查失敗就立刻中止,不進行打包                                            |
-> | 額外參數   | `{@}` 可轉給 `vite build`,如 `npm run build -- --mode staging` | 參數接在 `vite build` 後面,但 `&&` 串接下不易控制傳給誰                  |
-> | 額外套件   | 需要 `npm-run-all2`                                            | 不需要,只靠 shell 的 `&&`                                                |
-> | 可單獨執行 | 有 `type-check`、`build-only` 可分開跑                         | 要自己另外寫腳本才能分開跑                                               |
-> | 跨平台     | `run-p` 在 Windows、macOS、Linux 行為一致                      | `&&` 在多數 shell 都可用,但舊版 Windows cmd 與 PowerShell 5.1 行為有差異 |
+> | 比較項目   | `run-p type-check "build-only {@}" --`                         | `run-s type-check "build-only {@}" --`                 | 簡化寫法 `vue-tsc -b && vite build`                                      |
+> | ---------- | -------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------ |
+> | 指令全稱   | `run-p` = `run parallel`(平行執行)                             | `run-s` = `run sequential`(依序執行,等同 `run serial`) | 無(shell 的 `&&`)                                                        |
+> | 執行方式   | 型別檢查與打包**平行**同時跑                                   | **依序**執行:先檢查,通過才打包                         | **依序**執行:先檢查,通過才打包                                           |
+> | 速度       | 較快,總時間約為兩者中較慢的那個                                | 較慢,總時間為兩者相加                                  | 較慢,總時間為兩者相加                                                    |
+> | 型別有錯時 | 打包可能已跑完或跑到一半,最後整體回報失敗                      | 檢查失敗就立刻中止,不進行打包                          | 檢查失敗就立刻中止,不進行打包                                            |
+> | 額外參數   | `{@}` 可轉給 `vite build`,如 `npm run build -- --mode staging` | 同左,`{@}` 轉給 `build-only`                           | 參數接在 `vite build` 後面,但 `&&` 串接下不易控制傳給誰                  |
+> | 額外套件   | 需要 `npm-run-all2`                                            | 需要 `npm-run-all2`                                    | 不需要,只靠 shell 的 `&&`                                                |
+> | 可單獨執行 | 有 `type-check`、`build-only` 可分開跑                         | 有 `type-check`、`build-only` 可分開跑                 | 要自己另外寫腳本才能分開跑                                               |
+> | 跨平台     | `run-p` 在 Windows、macOS、Linux 行為一致                      | `run-s` 在 Windows、macOS、Linux 行為一致              | `&&` 在多數 shell 都可用,但舊版 Windows cmd 與 PowerShell 5.1 行為有差異 |
 >
 > **適用情形:**
 >
-> - 重視 CI 速度、工具鏈較完整 → 用`run-p type-check "build-only {@}" --` (`create-vue` 官方預設)。
+> - 重視 CI 速度、工具鏈較完整 → 用 `run-p type-check "build-only {@}" --` (`create-vue` 官方預設)。
+> - 要「型別錯就不打包」,又想保留 `{@}` 傳參數與分開執行 → 用 `run-s type-check "build-only {@}" --`。
 > - 重視簡單、可預期的失敗順序 → 用 `vue-tsc -b && vite build`(Vite 官方模板寫法)。
 
 ### 測試
 
-| 指令                      | 實際執行          | 效果                                                                     |
-| ------------------------- | ----------------- | ------------------------------------------------------------------------ |
-| `npm run test:unit`       | `vitest run`      | 執行一次所有單元測試後結束,適合 CI                                       |
-| `npm run test:unit:watch` | `vitest`          | 監聽模式,改檔後自動重跑相關測試,適合開發時使用                           |
-| `npm run test:e2e`        | `playwright test` | 執行 Playwright E2E 測試。首次需執行 `npx playwright install` 下載瀏覽器 |
+| 指令                      | 實際執行                           | 效果                                                                     |
+| ------------------------- | ---------------------------------- | ------------------------------------------------------------------------ |
+| `npm run test:unit`       | `vitest run`                       | 執行一次所有單元測試後結束,適合 CI                                       |
+| `npm run test:unit:watch` | `vitest`                           | 監聽模式,改檔後自動重跑相關測試,適合開發時使用                           |
+| `npm run test:e2e`        | `playwright test`                  | 執行 Playwright E2E 測試。首次需執行 `npx playwright install` 下載瀏覽器 |
+| `npm run test:e2e:chrome` | `playwright test --project=chrome` | 只跑 `playwright.config.ts` 中名為 `chrome` 的 project(本機 Chrome)      |
+| `npm run test:e2e:edge`   | `playwright test --project=edge`   | 只跑名為 `edge` 的 project(本機 Edge)                                    |
+
+> E2E 若使用本機已安裝的 Chrome / Edge(Playwright 的 `channel`),`test:e2e` 會同時跑兩個 project,兩個瀏覽器都要裝。設定細節見 `docs/testing/playwright.md`。
 
 `vitest` 與 `vitest run` 的差異:
 
@@ -68,6 +86,8 @@
 
 ### 程式碼品質(Lint / Format)
 
+**修正類(會直接修改檔案)**
+
 | 指令                     | 實際執行                                    | 效果                                                                                                                                                                                                     |
 | ------------------------ | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `npm run lint`           | `run-s "lint:*"`                            | `run-s`(來自 `npm-run-all2`)依序(serial)執行所有 `lint:` 開頭的腳本,`*` 為萬用字元,新增 `lint:xxx` 會自動納入,不必改這行                                                                                 |
@@ -75,6 +95,19 @@
 | `npm run lint:eslint`    | `eslint . --fix --cache`                    | 用 ESLint 檢查整個專案。`.` 代表從專案根目錄開始掃描,`--fix` 自動修正,`--cache` 只重新檢查有變動的檔案(快取存於 `.eslintcache`),重複執行時更快                                                           |
 | `npm run lint:stylelint` | `stylelint "src/**/*.{css,scss,vue}" --fix` | 用 Stylelint 檢查樣式。引號內為檔案範圍(glob),`src/` 下所有 `.css`、`.scss`、`.vue`(含 `<style>` 區塊)都會檢查,`--fix` 自動修正。規則設定在 `.stylelintrc.json`;因 `lint` 會執行所有 `lint:*`,會一併跑到 |
 | `npm run format`         | `prettier --write src/`                     | 把 `src/` 下的檔案依 Prettier 規則統一排版。`--write` 直接覆寫檔案(沒加則只輸出結果);`src/` 限定處理範圍,避免動到設定檔與 `node_modules`                                                                 |
+
+**檢查類(唯讀,不修改檔案)**
+
+| 指令                           | 實際執行                              | 效果                                                               |
+| ------------------------------ | ------------------------------------- | ------------------------------------------------------------------ |
+| `npm run check:lint`           | `run-s "check:lint:*"`                | 依序執行所有 `check:lint:` 開頭的腳本(oxlint → ESLint → Stylelint) |
+| `npm run check:lint:oxlint`    | `oxlint .`                            | 同 `lint:oxlint`,但不加 `--fix`,只回報問題                         |
+| `npm run check:lint:eslint`    | `eslint . --cache`                    | 同 `lint:eslint`,但不加 `--fix`,保留 `--cache`                     |
+| `npm run check:lint:stylelint` | `stylelint "src/**/*.{css,scss,vue}"` | 同 `lint:stylelint`,但不加 `--fix`                                 |
+| `npm run check:format`         | `prettier --check src/`               | 檢查 `src/` 是否符合 Prettier 格式,不符時列出檔案並回傳失敗        |
+
+> - `lint:*` 與 `format` 都會直接改檔,執行前先確認 Git 工作區狀態。
+> - 只想檢查、不想改檔(例如 CI)時,用 `check:*`。
 
 > **備註:`format` 要不要加 `--experimental-cli`?**
 >
@@ -118,6 +151,22 @@
 | --------- | -------- | --------------------------------------------------------------------------------------------- |
 | `prepare` | `husky`  | 執行 `npm install` 後自動觸發,安裝 Git hooks,在 commit 前可自動跑檢查，避免推版有問題的程式碼 |
 
+`.husky/` 內的 hook 檔(Git 操作時自動執行的腳本):
+
+| Hook         | 觸發時機     | 執行指令                                     | 效果                                                                                                                 |
+| ------------ | ------------ | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `pre-commit` | `git commit` | `npx lint-staged`(可加 `--concurrent false`) | 只對已 staged 的檔案跑 `lint-staged` 設定的指令(見第 4 節);加 `--concurrent false` 則各副檔名群組改為依序執行,不平行 |
+| `pre-push`   | `git push`   | `npm run build`                              | push 前先對全專案型別檢查,通過後以 `production` mode 打包                                                            |
+
+> - 任一檢查失敗,commit 或 push 就會中止,修正後重新提交。
+> - Husky 只在本機觸發,可被 `git commit --no-verify` 繞過,CI 仍要重新完整檢查。
+> - `--concurrent false`:`lint-staged` 預設會平行執行不同 glob(檔案比對規則)的指令。`.vue` 同時符合三組 glob,關掉平行可避免多個工具同時改寫同一個檔案。
+
+**Hook 未觸發時的排查**
+
+1. 確認 Git hooks 路徑:`git config core.hooksPath`,輸出應為 `.husky/_`。
+2. 若不符,重新初始化 Husky:`npm run prepare`。
+
 ## 3. dependencies(正式環境相依套件)
 
 - 這些套件會被打包進最終的程式,是執行階段需要的。
@@ -134,8 +183,10 @@
 | `@stomp/stompjs`                                    | 以 STOMP 協定連 WebSocket,做即時通訊(如：聊天、通知)                                                |
 | `jwt-decode`                                        | 解碼 JWT token,讀取登入者資訊(只解碼,不驗證簽章)                                                    |
 | `@mdi/font`                                         | Material Design Icons 圖示字型,Vuetify 圖示使用(`src/plugins/vuetify.ts` 引入)                      |
+| `@mdi/js`                                           | Material Design Icons 的 SVG path,用到哪個圖示就 import 哪個,打包時只帶入用到的圖示                 |
 | `zod`                                               | Schema 驗證,用於表單與 API 回應的資料驗證與型別推導。表單處理方式見下方備註                         |
 | `date-fns`                                          | 日期處理函式庫,函式式寫法、支援 tree-shaking(取代 dayjs)                                            |
+| `@date-fns/tz`                                      | `date-fns` 的時區擴充,`src/utils/date.ts` 用它把 UTC 轉成台北時間                                   |
 | `decimal.js`                                        | 高精度小數運算,避免浮點誤差(取代 number-precision)                                                  |
 | `lodash-es`                                         | 常用工具函式(ESM 版,支援 tree-shaking,只打包用到的部分)                                             |
 | `taiwan-id-validator`                               | 台灣身分證字號驗證(沿用)                                                                            |
@@ -170,13 +221,15 @@ Vue 3 + TypeScript 的新專案建議用 date-fns,也是 issue 的決議。注�
 
 ### 建置工具
 
-| 套件                       | 用途                                                  |
-| -------------------------- | ----------------------------------------------------- |
-| `vite`                     | 建置與開發伺服器                                      |
-| `@vitejs/plugin-vue`       | 讓 Vite 能處理 `.vue` 單一檔案元件(SFC)               |
-| `vite-plugin-vue-devtools` | 在開發時整合 Vue DevTools                             |
-| `vite-plugin-vuetify`      | Vuetify 的 Vite 外掛,元件按需載入、支援 SCSS 變數覆寫 |
-| `sass-embedded`            | 編譯 SCSS 樣式                                        |
+| 套件                       | 用途                                                                  |
+| -------------------------- | --------------------------------------------------------------------- |
+| `vite`                     | 建置與開發伺服器                                                      |
+| `@vitejs/plugin-vue`       | 讓 Vite 能處理 `.vue` 單一檔案元件(SFC)                               |
+| `vite-plugin-vue-devtools` | 在開發時整合 Vue DevTools                                             |
+| `vite-plugin-vuetify`      | Vuetify 的 Vite 外掛,元件按需載入、支援 SCSS 變數覆寫                 |
+| `vite-svg-loader`          | 把 SVG 當成 Vue 元件載入(`vite.config.ts` 的 `svgLoader()`)           |
+| `sass-embedded`            | 編譯 SCSS 樣式                                                        |
+| `autoprefixer`             | 依 `browserslist` 自動補上 CSS 前綴(`vite.config.ts` 的 PostCSS 外掛) |
 
 ### TypeScript 與型別
 
@@ -195,6 +248,7 @@ Vue 3 + TypeScript 的新專案建議用 date-fns,也是 issue 的決議。注�
 | 套件                    | 用途                                                                                                            |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------- |
 | `vitest`                | 單元測試框架,與 Vite 共用設定                                                                                   |
+| `@vitest/coverage-v8`   | Vitest 的覆蓋率(coverage,測試跑到多少程式碼)外掛,以 V8 引擎收集;目前 scripts 與 `vitest.config.ts` 都還沒用到   |
 | `@vue/test-utils`       | Vue 元件測試工具(掛載、觸發事件、斷言)                                                                          |
 | `@testing-library/vue`  | 以使用者角度寫元件測試(取代 @testing-library/react)                                                             |
 | `jsdom`                 | 在 Node 模擬瀏覽器 DOM,供 Vitest 跑元件測試(需在 Vitest 設定 `environment: 'jsdom'`,型別由 `@types/jsdom` 提供) |
@@ -203,49 +257,52 @@ Vue 3 + TypeScript 的新專案建議用 date-fns,也是 issue 的決議。注�
 
 ### Lint 與格式化
 
-| 套件                            | 用途                               |
-| ------------------------------- | ---------------------------------- |
-| `eslint`                        | 程式碼檢查工具                     |
-| `eslint-plugin-vue`             | Vue 專用的 ESLint 規則             |
-| `vue-eslint-parser`             | 讓 ESLint 能解析 `.vue` 檔         |
-| `@vue/eslint-config-typescript` | Vue + TypeScript 的 ESLint 設定    |
-| `eslint-plugin-oxlint`          | 關閉與 Oxlint 重複的 ESLint 規則   |
-| `eslint-config-prettier`        | 關閉與 Prettier 衝突的 ESLint 規則 |
-| `oxlint`                        | 以 Rust 撰寫的高速 linter          |
-| `prettier`                      | 程式碼排版工具                     |
+| 套件                            | 用途                                                                    |
+| ------------------------------- | ----------------------------------------------------------------------- |
+| `eslint`                        | 程式碼檢查工具                                                          |
+| `eslint-plugin-vue`             | Vue 專用的 ESLint 規則                                                  |
+| `vue-eslint-parser`             | 讓 ESLint 能解析 `.vue` 檔                                              |
+| `@vue/eslint-config-typescript` | Vue + TypeScript 的 ESLint 設定                                         |
+| `typescript-eslint`             | TypeScript 的 ESLint 規則                                               |
+| `eslint-plugin-oxlint`          | 關閉與 Oxlint 重複的 ESLint 規則                                        |
+| `eslint-config-prettier`        | 關閉與 Prettier 衝突的 ESLint 規則                                      |
+| `jiti`                          | 讓 Node 能直接載入 TypeScript 設定檔,ESLint 靠它讀取 `eslint.config.ts` |
+| `oxlint`                        | 以 Rust 撰寫的高速 linter                                               |
+| `prettier`                      | 程式碼排版工具                                                          |
 
 ### 樣式檢查
 
 | 套件                               | 用途                                    |
 | ---------------------------------- | --------------------------------------- |
 | `stylelint`                        | CSS / SCSS 檢查工具                     |
+| `stylelint-config-standard`        | CSS 的標準規則集                        |
 | `stylelint-config-standard-scss`   | SCSS 的標準規則集                       |
 | `stylelint-config-recommended-vue` | Vue 單一檔案元件中 `<style>` 的推薦規則 |
 | `postcss-html`                     | 讓 Stylelint 能解析 `.vue` 內的樣式區塊 |
 
 ### 開發流程工具
 
-| 套件           | 用途                                                                                             |
-| -------------- | ------------------------------------------------------------------------------------------------ |
-| `husky`        | 管理 Git hooks                                                                                   |
-| `lint-staged`  | 只對已 `git add` 的檔案跑檢查,加快 commit 前的驗證。`.husky/pre-commit` 會執行 `npx lint-staged` |
-| `npm-run-all2` | 提供 `run-p`(平行)與 `run-s`(依序)指令                                                           |
+| 套件           | 用途                                                                             |
+| -------------- | -------------------------------------------------------------------------------- |
+| `husky`        | 管理 Git hooks                                                                   |
+| `lint-staged`  | 只對已 `git add` 的檔案跑檢查,加快 commit 前的驗證。`.husky/pre-commit` 會執行它 |
+| `npm-run-all2` | 提供 `run-p`(平行)與 `run-s`(依序)指令                                           |
 
 **lint-staged 設定:** commit 前只對「已暫存(staged)的檔案」依副檔名執行下列指令。
 
-| 檔案類型                         | 執行指令           | 效果               |
-| -------------------------------- | ------------------ | ------------------ |
-| `*.{js,ts,vue}`                  | `eslint --fix`     | 檢查並自動修正腳本 |
-| `*.{css,scss,vue}`               | `stylelint --fix`  | 檢查並自動修正樣式 |
-| `*.{js,ts,vue,css,scss,json,md}` | `prettier --write` | 統一排版           |
+| 檔案類型                         | 執行指令                        | 效果                                                                                   |
+| -------------------------------- | ------------------------------- | -------------------------------------------------------------------------------------- |
+| `*.{js,ts,vue}`                  | `oxlint --fix` → `eslint --fix` | 先用 Oxlint 快速修正,再跑 ESLint 檢查並自動修正腳本(Oxlint 可省略,只跑 `eslint --fix`) |
+| `*.{css,scss,vue}`               | `stylelint --fix`               | 檢查並自動修正樣式                                                                     |
+| `*.{js,ts,vue,css,scss,json,md}` | `prettier --write`              | 統一排版                                                                               |
 
 > `.husky/pre-commit` 會執行 `npx lint-staged`,若 `package.json` 沒有 `lint-staged` 設定,commit 會失敗,兩者需成對存在。
 
 ## 5. engines(執行環境限制)
 
-| 欄位           | 值              | 說明                                                                                                                         |
-| -------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `engines.node` | `>=24.21.0 <25` | 指定可用的 Node 版本範圍:24.21.0 以上、25 以下。版本不符時,npm 預設只會警告;若要強制,需在 `.npmrc` 加上 `engine-strict=true` |
+| 欄位           | 值              | 說明                                                                                                                                                                                                             |
+| -------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `engines.node` | `>=24.21.0 <25` | 指定可用的 Node 版本範圍:24.21.0 以上、25 以下(下限可依需求放寬,如 `>=24.0.0 <25` 即任何 24.x 皆可)。版本不符時,npm 預設只會警告;若要強制,需在 `.npmrc` 加上 `engine-strict=true`,此時 `npm ci` 會直接報錯並中止 |
 
 **採用 Node 24.21.0 LTS的理由:** 24.x 是長期支援(LTS,代號 Krypton)版本,適合正式環境,24.21.0 為 2026-09-07 發佈的版本,與 issue 一致。`engines` 寫成範圍而不是釘死單一版本,是因為 Node 版本不屬於套件相依,釘死會讓之後的 24.x 安全性修補版全部觸發警告。要讓團隊本機版本一致,改用 `.nvmrc`(內容 `24.21.0`),搭配 nvm 等版本管理工具切換。
 
@@ -261,6 +318,15 @@ Vue 3 + TypeScript 的新專案建議用 date-fns,也是 issue 的決議。注�
 
 > 固定版本的好處是可重現(Reproducible)，缺點是安全性更新要自行追蹤。可搭配 `package-lock.json` 與定期更新相依套件來處理。
 
+**適合用 `~` 的套件與理由**
+
+| 套件                             | 寫法       | 理由                                                    |
+| -------------------------------- | ---------- | ------------------------------------------------------- |
+| `oxlint`、`eslint-plugin-oxlint` | `~1.82.0`  | 兩者要同步升級,否則 ESLint 關掉的規則會和 Oxlint 對不上 |
+| `typescript`                     | `~6.0.0`   | 只允許升 patch                                          |
+| `eslint-plugin-vue`              | `~10.11.0` | 只允許升 patch                                          |
+| `typescript-eslint`              | `~8.71.0`  | 只允許升 patch                                          |
+
 ### 有 lock 檔時,還需要 `^` 嗎?
 
 `npm ci` / `npm install` 都以 `package-lock.json` 為準,**實際安裝的版本由 lock 決定**,與 `^` 無關。`^` 只影響:執行 `npm install`(無參數)時 lock 是否可能被升級,以及 `npm update` 能升到哪個範圍。
@@ -273,17 +339,42 @@ Vue 3 + TypeScript 的新專案建議用 date-fns,也是 issue 的決議。注�
 | 缺點       | 安全更新需自行追蹤                                                        | 小版本偶有破壞性行為,升級較不可控         |
 | 適用情境   | `private` 應用程式;使用 `typescript 6`、`vite 8`、`vitest 4` 等較新主版本 | 發布給他人使用的 library;低風險工具類套件 |
 
-**本專案做法:** 維持固定版本,搭配 Renovate / Dependabot 開 PR 升級,測試通過再合併。若想讓 `npm install xxx` 預設存精確版本,在 `.npmrc` 加上 `save-exact=true`。低風險工具(如 `prettier`、`@types/*`)可選擇性改用 `^`,核心的 `vue`、`vite`、`typescript`、`vuetify` 維持固定。
+**本專案做法:** 維持固定版本,搭配 Renovate / Dependabot 開 PR 升級,測試通過再合併。`.npmrc` 已設 `save-exact=true`,`npm install xxx` 會預設存精確版本。低風險工具(如 `prettier`、`@types/*`)可選擇性改用 `^`,核心的 `vue`、`vite`、`typescript`、`vuetify` 維持固定。
 
 ## 7. 常用指令速查
 
 ```bash
+npm ci                 # 依 package-lock.json 乾淨安裝,安裝完套件會觸發 husky 安裝 Git hooks
 npm install            # 安裝相依套件,並觸發 husky 安裝 Git hooks
 npm run dev            # 啟動開發伺服器
 npm run build          # 型別檢查 + 打包
 npm run preview        # 預覽打包結果
 npm run test:unit      # 跑一次單元測試
-npm run test:e2e       # 跑 E2E 測試(首次先 npx playwright install)
+npm run test:e2e       # 跑 E2E 測試(首次先 npx playwright install 從外部下載; 內網則優先以本機的瀏覽器執行)
 npm run lint           # 依序跑所有 lint 腳本
 npm run format         # 排版 src/
 ```
+
+### 安裝或更新依賴(`npm ci` 流程)
+
+- 首次安裝,或 `git pull` 後 `package.json` / `package-lock.json` 有變動時,在專案根目錄執行 `npm ci`。
+- `npm ci` 會先刪除 `node_modules`,再完全照 `package-lock.json` 安裝,確保團隊版本一致。
+- 安裝完會觸發 `prepare` 初始化 Husky(需在 Git 專案內,且沒加 `--ignore-scripts`)。
+
+**注意事項**
+
+- `package.json` 與 `package-lock.json` 不同步時,`npm ci` 會直接報錯,不會自動修正 lock。
+- 執行前先關閉所有用到 `node_modules` 的程序(`npm run dev`、`npm run test:unit:watch`、E2E 的 preview 服務)。
+- Windows 出現 `EPERM`(權限錯誤),通常是檔案被上述程序、IDE 或防毒軟體佔用。
+
+**新增、移除或升級套件**
+
+```bash
+npm install <套件名稱>          # 新增
+npm install -D <套件名稱>       # 新增為 devDependencies
+npm uninstall <套件名稱>        # 移除
+npm install <套件名稱>@<版本>   # 升級或指定版本
+```
+
+- 變更後把 `package.json` 與 `package-lock.json` **一併 commit**。
+- 其他成員 `git pull` 後執行 `npm ci` 即可同步(包含已移除的套件)。
