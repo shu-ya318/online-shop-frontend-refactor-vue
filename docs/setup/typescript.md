@@ -1,11 +1,32 @@
-# TypeScript 設定檔：tsconfig.json、tsconfig.app.json、tsconfig.node.json、tsconfig.vitest.json 說明
+# TypeScript 設定檔：tsconfig.json、tsconfig.app.json、tsconfig.node.json、tsconfig.vitest.json、env.d.ts 說明
 
 `npm run type-check`(`vue-tsc --build`)依下列順序執行:
 
 1. **tsconfig.json:** 入口檔,自己不檢查任何檔案,只用 `references` 串起另外三份設定。
-2. **tsconfig.node.json:** 檢查跑在 Node 的設定檔(`vite.config.*`、`vitest.config.*`、`playwright.config.*`、`eslint.config.*`)。
+2. **tsconfig.node.json:** 檢查跑在 Node 的設定檔(`vite.config.*`、`vitest.config.*`、`playwright.config.*`、`eslint.config.*`)與 E2E 測試(`e2e/`)。
 3. **tsconfig.app.json:** 檢查瀏覽器端的應用程式碼(`src/`),是最主要的一份。
 4. **tsconfig.vitest.json:** 檢查單元測試(`src/**/__tests__/`)與測試共用工具(`src/test/`),繼承 app 設定再補上測試所需的型別。
+
+根目錄的 `env.d.ts` 不是設定檔,是全域型別宣告檔(`.d.ts`,只放型別、不產生程式碼),由 app 與 vitest 兩份設定的 `include` 納入。
+
+## 檔案間依賴關係
+
+```text
+                      references            extends
+                  ┌─> tsconfig.node.json   ─────────> @tsconfig/node24
+                  │
+tsconfig.json ────┼─> tsconfig.app.json    ─────────> @vue/tsconfig/tsconfig.dom.json
+                  │        ^      ^
+                  │        │      │ include
+                  │ extends│      └──────── env.d.ts
+                  │        │                   │
+                  └─> tsconfig.vitest.json ────┘ include
+```
+
+- `tsconfig.json` 只負責 `references`(串起三份),不放任何編譯選項。
+- `node` 與 `app` 各自繼承不同的外部基底,彼此獨立。
+- `vitest` 繼承 `app`,alias 與嚴格模式不必重寫。
+- `env.d.ts` 同時被 `app` 與 `vitest` 納入,所以兩邊都能用 `import.meta.env` 的型別。
 
 ## tsconfig.json
 
@@ -16,30 +37,31 @@
 
 ## tsconfig.node.json
 
-| 設定                                                | 效果                                                  |
-| --------------------------------------------------- | ----------------------------------------------------- |
-| `extends: "@tsconfig/node24/tsconfig.json"`         | 以 Node 24 的建議設定為基底                           |
-| `include`                                           | 只涵蓋各工具的設定檔,不含 `src/`                      |
-| `module: "preserve"`、`moduleResolution: "bundler"` | 沿用打包工具的解析方式,與 Vite 行為一致               |
-| `allowImportingTsExtensions: true`                  | 允許 `import './x.ts'` 帶副檔名                       |
-| `types: ["node"]`                                   | 只載入 Node 型別,避免誤引入其他 `@types/*`            |
-| `noEmit: true`                                      | 只做型別檢查,不輸出檔案                               |
-| `tsBuildInfoFile`                                   | 增量檢查的快取檔放進 `node_modules/.tmp`,不污染根目錄 |
+| 設定                                                                                                                               | 效果                                                  |
+| ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `extends: "@tsconfig/node24/tsconfig.json"`                                                                                        | 以 Node 24 的建議設定為基底                           |
+| `include: ["vite.config.*", "vitest.config.*", "playwright.config.*", "eslint.config.*", "e2e/**/*"]`(或另加 `"cypress.config.*"`) | 涵蓋各工具的設定檔與 `e2e/` 測試,不含 `src/`          |
+| `module: "preserve"`、`moduleResolution: "bundler"`                                                                                | 沿用打包工具的解析方式,與 Vite 行為一致               |
+| `allowImportingTsExtensions: true`                                                                                                 | 允許 `import './x.ts'` 帶副檔名                       |
+| `types: ["node"]`                                                                                                                  | 只載入 Node 型別,避免誤引入其他 `@types/*`            |
+| `noEmit: true`                                                                                                                     | 只做型別檢查,不輸出檔案                               |
+| `tsBuildInfoFile`                                                                                                                  | 增量檢查的快取檔放進 `node_modules/.tmp`,不污染根目錄 |
 
 ## tsconfig.app.json
 
-| 設定                                                    | 效果                                                               |
-| ------------------------------------------------------- | ------------------------------------------------------------------ |
-| `extends: "@vue/tsconfig/tsconfig.dom.json"`            | 以 Vue 官方的瀏覽器端設定為基底(含 DOM 型別)                       |
-| `include: ["env/env.d.ts", "src/**/*", "src/**/*.vue"]` | 寬鬆範圍,不綁特定資料夾,調整結構時不必再改;`.vue` 需另外列出       |
-| `exclude: ["src/**/__tests__/*", "src/test/**/*"]`      | 測試檔交給 vitest 那份設定,不混進應用程式的檢查                    |
-| `strict: true`                                          | 嚴格模式明寫在設定檔                                               |
-| `noUncheckedIndexedAccess`                              | 以索引取陣列、物件的值時,型別含 `undefined`,強制檢查               |
-| `noUnusedLocals`、`noUnusedParameters`                  | 未使用的變數、參數視為錯誤                                         |
-| `erasableSyntaxOnly`                                    | 禁用 `enum`、`namespace` 等無法直接抹除的語法,相容 Node 的型別剝除 |
-| `noFallthroughCasesInSwitch`                            | `switch` 的 case 漏寫 `break` 時報錯                               |
-| `paths: { "@/*": ["./src/*"] }`                         | 只留一條,與 vite 的 `resolve.alias` `'@'` 對應                     |
-| `tsBuildInfoFile`                                       | 同 node,快取檔放進 `node_modules/.tmp`                             |
+| 設定                                                                            | 效果                                                               |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `extends: "@vue/tsconfig/tsconfig.dom.json"`                                    | 以 Vue 官方的瀏覽器端設定為基底(含 DOM 型別)                       |
+| `include: ["env.d.ts", "src/**/*", "src/**/*.vue"]`                             | 寬鬆範圍,不綁特定資料夾,調整結構時不必再改;`.vue` 需另外列出       |
+| `exclude: ["src/**/__tests__/*", "src/test/**/*"]`(或 `["src/**/__tests__/*"]`) | 測試檔與測試共用工具交給 vitest 那份設定,不混進應用程式的檢查      |
+| `strict: true`                                                                  | 嚴格模式明寫在設定檔                                               |
+| `noUncheckedIndexedAccess`                                                      | 以索引取陣列、物件的值時,型別含 `undefined`,強制檢查               |
+| `noUnusedLocals`、`noUnusedParameters`                                          | 未使用的變數、參數視為錯誤                                         |
+| `erasableSyntaxOnly`                                                            | 禁用 `enum`、`namespace` 等無法直接抹除的語法,相容 Node 的型別剝除 |
+| `noFallthroughCasesInSwitch`                                                    | `switch` 的 case 漏寫 `break` 時報錯                               |
+| `resolveJsonModule: true`                                                       | 允許 `import` JSON 檔,並依內容推得型別                             |
+| `paths: { "@/*": ["./src/*"] }`                                                 | 只留一條,與 vite 的 `resolve.alias` `'@'` 對應                     |
+| `tsBuildInfoFile`                                                               | 同 node,快取檔放進 `node_modules/.tmp`                             |
 
 ### 應避免的錯誤
 
@@ -55,23 +77,34 @@
 
 ## tsconfig.vitest.json
 
-| 設定                                                               | 效果                                                              |
-| ------------------------------------------------------------------ | ----------------------------------------------------------------- |
-| `extends: "./tsconfig.app.json"`                                   | 繼承 app 設定,alias、嚴格模式只需維護一份                         |
-| `include: ["src/**/__tests__/*", "src/test/**/*", "env/env.d.ts"]` | 只檢查測試檔與測試共用工具                                        |
-| `exclude: []`                                                      | 清空繼承來的 `exclude`;否則 app 排除了測試檔,這裡就什麼都檢查不到 |
-| `lib: ["ES2022"]`                                                  | 指定測試可用的標準函式庫                                          |
-| `types: ["node", "jsdom"]`                                         | 載入 Node 與 jsdom 型別                                           |
-| `tsBuildInfoFile`                                                  | 快取檔放進 `node_modules/.tmp`                                    |
+| 設定                                                                                                    | 效果                                                                                            |
+| ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `extends: "./tsconfig.app.json"`                                                                        | 繼承 app 設定,alias、嚴格模式只需維護一份                                                       |
+| `include: ["src/**/__tests__/*", "src/test/**/*", "env.d.ts"]`(或 `["src/**/__tests__/*", "env.d.ts"]`) | 只檢查測試檔與測試共用工具;setup 檔放 `src/__tests__/setup.ts` 時已由 `src/**/__tests__/*` 涵蓋 |
+| `exclude: []`                                                                                           | 清空繼承來的 `exclude`;否則 app 排除了測試檔,這裡就什麼都檢查不到                               |
+| `lib: ["ES2022"]`                                                                                       | 指定測試可用的標準函式庫                                                                        |
+| `types: ["node", "jsdom"]`                                                                              | 載入 Node 與 jsdom 型別                                                                         |
+| `tsBuildInfoFile`                                                                                       | 快取檔放進 `node_modules/.tmp`                                                                  |
 
 ### 應避免的錯誤
 
 - 錯誤1：在 vitest 的 tsconfig 另寫一份 `paths`
   - 繼承 app 已經有 `paths`,卻又重寫一份。
-- 後果
-  - 兩份 `paths` 日後再次不同步。
+  - 後果
+    - 兩份 `paths` 日後再次不同步。
 
 - 錯誤2：繼承 app 後沒有清空 `exclude`
   - app 的 `exclude` 會一併被繼承,把測試檔排除掉。
-- 後果
-  - 測試檔沒有被型別檢查,錯誤要到執行測試時才發現。
+  - 後果
+    - 測試檔沒有被型別檢查,錯誤要到執行測試時才發現。
+
+## env.d.ts
+
+| 設定                                                                                                                                               | 效果                                                                          |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `/// <reference types="vite/client" />`                                                                                                            | 引入 Vite 內建型別:`import.meta.env` 基本欄位、`*.png`/`*.css` 等資源模組宣告 |
+| `declare const __APP_VERSION__: string`                                                                                                            | 宣告版號常數,值由 `vite.config.ts` 的 `define` 在建置時寫入                   |
+| `declare module '*.svg?component'`                                                                                                                 | 讓 `import X from './x.svg?component'` 取得 Vue 元件(`Component`)型別         |
+| `interface ImportMetaEnv`                                                                                                                          | 自訂環境變數型別,取代預設的 `any`,編譯期就能檢查                              |
+| `readonly VITE_API_BASE_URL?: string`、`readonly VITE_WS_URL?: string`(或 `readonly VITE_APP_TITLE: string`、`readonly VITE_API_BASE_URL: string`) | 加 `?` 為選填,型別含 `undefined`;不加 `?` 為必填                              |
+| `interface ImportMeta { readonly env: ImportMetaEnv }`                                                                                             | 把上面的型別掛到 `import.meta.env`,讓 IDE 提示與型別檢查生效                  |
